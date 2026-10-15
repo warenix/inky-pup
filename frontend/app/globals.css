@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply text-slate-900;
+  background: linear-gradient(180deg, #e0f2fe 0%, #fef9c3 55%, #dcfce7 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  font-family:
+    ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN",
+    "Chalkboard SE", "Comic Sans MS", "Comic Neue", system-ui, sans-serif;
+  font-size: 1.05rem;
+}
+
+/* Chunky kid-friendly press effect for big buttons */
+.btn-kid {
+  @apply transition active:scale-95;
+  min-height: 3.5rem;
+}
