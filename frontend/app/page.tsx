@@ -5,7 +5,9 @@ import CropEditor from "../components/CropEditor";
 import KidSettings from "../components/KidSettings";
 import LibraryPanel from "../components/LibraryPanel";
 import PlayerEngine from "../components/PlayerEngine";
+import ReceivePanel from "../components/ReceivePanel";
 import ReviewStep from "../components/ReviewStep";
+import SharePanel from "../components/SharePanel";
 import Stepper, { type Step } from "../components/Stepper";
 import {
   cropImage,
@@ -15,6 +17,7 @@ import {
   type OcrProgress,
 } from "../lib/ocr";
 import { deleteEntry, listEntries, renameEntry, saveEntry, updateEntry, type DictationEntry } from "../lib/library";
+import { clearShareFromLocation, parseShareFromLocation } from "../lib/share";
 import { estimateSeconds, formatEstimate } from "../lib/estimate";
 import { DEFAULT_SETTINGS, type DictationItem, type TeacherSettings } from "../lib/types";
 
@@ -139,6 +142,20 @@ export default function Home() {
 
   useEffect(() => {
     listEntries().then(setEntries).catch(() => {});
+    // No-backend share: opening a #d=... link loads the dictation.
+    try {
+      const shared = parseShareFromLocation();
+      if (shared && shared.items.length > 0) {
+        setItems(shared.items);
+        setSettings(shared.settings);
+        setLoadedId(null);
+        setFlow("scan");
+        setScreen("review");
+        clearShareFromLocation();
+      }
+    } catch {
+      clearShareFromLocation();
+    }
   }, []);
 
   const refreshEntries = async () => {
@@ -282,6 +299,16 @@ export default function Home() {
     }
   };
 
+  /** Shared link / file arrived via ReceivePanel — jump to review. */
+  const handleImportShared = (sharedItems: DictationItem[], sharedSettings: TeacherSettings) => {
+    setItems(sharedItems);
+    setSettings(sharedSettings);
+    setLoadedId(null);
+    setError(null);
+    setFlow("scan");
+    setScreen("review");
+  };
+
   const handleRenameEntry = async (id: string, name: string) => {
     try {
       await renameEntry(id, name);
@@ -324,6 +351,7 @@ export default function Home() {
           <p className="mt-6 text-sm text-slate-400">🔒 Everything stays on this device — no internet needed!</p>
         </section>
       )}
+      {screen === "home" && <ReceivePanel onImport={handleImportShared} />}
 
       {screen === "library" && (
         <>
@@ -389,6 +417,7 @@ export default function Home() {
       {screen === "review" && (
         <>
           <ReviewStep items={items} setItems={setItems} />
+          <SharePanel items={items} settings={settings} />
           {savedFlash && (
             <p className="rounded-2xl bg-green-100 p-3 text-center text-lg font-black text-green-700">
               Saved! 🎉 Find it in 📚 My dictations.
@@ -429,6 +458,7 @@ export default function Home() {
           )}
           <KidSettings settings={settings} setSettings={setSettings} />
           <EstimateCard items={items} settings={settings} />
+          <SharePanel items={items} settings={settings} />
           <div className="flex flex-col gap-3">
             <button
               onClick={() => {
