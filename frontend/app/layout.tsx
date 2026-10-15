@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Smart Dictation Assistant",
+  title: "Inky Pup Dictation",
   description: "Scan dictation sheets with OCR, review, and play back with speech synthesis.",
 };
 

@@ -1,4 +1,4 @@
-# Smart Dictation Assistant
+# Inky Pup Dictation
 
 Scan dictation sheets with OCR, review the words, configure a virtual teacher,
 and play back dictation with the browser's speech synthesis.

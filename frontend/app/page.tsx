@@ -305,8 +305,8 @@ export default function Home() {
       {screen === "home" && (
         <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
           <p className="text-7xl">🦉</p>
-          <h1 className="mt-2 text-3xl font-black">Let&apos;s practise!</h1>
-          <p className="mt-1 text-lg text-slate-500">Your dictation buddy 🎉</p>
+          <h1 className="mt-2 text-3xl font-black">Inky Pup Dictation</h1>
+          <p className="mt-1 text-lg text-slate-500">Let&apos;s practise! 🎉</p>
           <div className="mt-6 flex flex-col gap-3">
             <button
               onClick={goScan}
