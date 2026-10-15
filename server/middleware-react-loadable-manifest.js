@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST='{"lib/ocr.ts -> tesseract.js":{"id":7728,"files":["static/chunks/728.32165d1bfbf46b6f.js"]}}';
