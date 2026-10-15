@@ -114,7 +114,7 @@ export function extractShareCode(input: string): string | null {
   if (!t) return null;
   const hashIdx = t.indexOf(`#${HASH_KEY}`);
   if (hashIdx >= 0) {
-    const code = t.slice(hashIdx + 2 + HASH_KEY.length).split(/[&\s]/)[0];
+    const code = t.slice(hashIdx + 1 + HASH_KEY.length).split(/[&\s]/)[0];
     return code || null;
   }
   if (t.startsWith(HASH_KEY)) return t.slice(HASH_KEY.length).split(/[&\s]/)[0] || null;
