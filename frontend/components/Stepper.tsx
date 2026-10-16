@@ -25,7 +25,7 @@ export default function Stepper({ steps, current }: { steps: Step[]; current: nu
                         : "bg-slate-200"
                   }`}
                 >
-                  {done ? "⭐" : s.icon}
+                  {done ? "⭐" : s.icon || i + 1}
                 </span>
                 <span
                   className={`mt-1 text-[11px] font-bold sm:text-xs ${

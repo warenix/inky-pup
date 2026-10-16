@@ -31,10 +31,10 @@ export default function LibraryPanel({ entries, loadedId, onLoad, onDelete, onRe
   if (entries.length === 0) {
     return (
       <section className="rounded-3xl bg-white p-6 text-center shadow-sm">
-        <p className="text-6xl">📭</p>
+
         <h2 className="mt-2 text-2xl font-black">Nothing here yet!</h2>
         <p className="mt-1 text-slate-500">
-          Scan a sheet, check the words, then tap 💾 Save to keep it here.
+          Scan a sheet, check the words, then tap Save to keep it here.
         </p>
       </section>
     );
@@ -42,7 +42,7 @@ export default function LibraryPanel({ entries, loadedId, onLoad, onDelete, onRe
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">📚 My dictations</h2>
+      <h2 className="text-center text-2xl font-black"> My dictations</h2>
       <p className="mt-1 text-center text-slate-500">Tap one to practise! ▶️</p>
       <ul className="mt-4 space-y-3">
         {entries.map((e) => (
@@ -83,7 +83,7 @@ export default function LibraryPanel({ entries, loadedId, onLoad, onDelete, onRe
             ) : (
               <>
                 <div className="flex items-center gap-2">
-                  <span className="text-3xl">📝</span>
+
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-lg font-black">{e.name}</p>
                     <p className="text-sm text-slate-400">
@@ -110,7 +110,7 @@ export default function LibraryPanel({ entries, loadedId, onLoad, onDelete, onRe
                     aria-label={`Delete ${e.name}`}
                     className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-xl text-red-500 hover:bg-red-200"
                   >
-                    🗑️
+                    Delete
                   </button>
                 </div>
               </>

@@ -28,18 +28,18 @@ type Screen = "home" | "library" | "scan" | "areas" | "review" | "ready" | "play
 type Flow = "scan" | "library";
 
 const SCAN_STEPS: Step[] = [
-  { icon: "📷", label: "Photo" },
-  { icon: "✏️", label: "Areas" },
-  { icon: "✅", label: "Words" },
-  { icon: "🎧", label: "Ready" },
-  { icon: "▶️", label: "Play" },
+  { icon: "", label: "Photo" },
+  { icon: "", label: "Areas" },
+  { icon: "", label: "Words" },
+  { icon: "", label: "Ready" },
+  { icon: "", label: "Play" },
 ];
 
 const LIB_STEPS: Step[] = [
-  { icon: "📚", label: "Library" },
-  { icon: "✅", label: "Words" },
-  { icon: "🎧", label: "Ready" },
-  { icon: "▶️", label: "Play" },
+  { icon: "", label: "Library" },
+  { icon: "", label: "Words" },
+  { icon: "", label: "Ready" },
+  { icon: "", label: "Play" },
 ];
 
 /** Self-marking: tap each answer ✓ / ✗ after practising alone. */
@@ -67,15 +67,15 @@ function AnswerCheck({
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="text-center text-2xl font-black">
-        📝 {hidden ? "Answers — mark your work!" : "What you practised"}
+        {hidden ? "Answers — mark your work!" : "What you practised"}
       </h2>
       {hidden && (
-        <p className="mt-1 text-center text-slate-500">Tap each one: ✅ I got it! ❌ Oops!</p>
+        <p className="mt-1 text-center text-slate-500">Tap each one: got it / missed.</p>
       )}
       {marked > 0 && (
         <p className="mt-2 text-center text-xl font-black text-amber-600">
-          ⭐ {correct}/{marked} right!
-          {marked === items.length && correct === items.length ? " Perfect! 🏆" : ""}
+          {correct}/{marked} right!
+          {marked === items.length && correct === items.length ? " Perfect! " : ""}
         </p>
       )}
       <ul className="mt-3 space-y-2">
@@ -99,7 +99,7 @@ function AnswerCheck({
                 </span>
                 <span className="min-w-0 flex-1 truncate text-lg font-bold">{it.text}</span>
                 {hidden && (
-                  <span className="text-2xl">{mark === true ? "✅" : mark === false ? "❌" : "⬜"}</span>
+                  <span className="text-base font-bold">{mark === true ? "Got it" : mark === false ? "Missed" : "—"}</span>
                 )}
               </button>
             </li>
@@ -126,7 +126,7 @@ function EstimateCard({ items, settings }: { items: DictationItem[]; settings: T
   if (items.length === 0) return null;
   const { big, small } = formatEstimate(estimateSeconds(items, settings));
   return (
-    <section className="rounded-3xl border-4 border-amber-300 bg-amber-100 p-4 text-center shadow-sm">
+    <section className="rounded-3xl border-4 border-amber-300 bg-amber-100 p-6 text-center shadow-sm">
       <p className="text-5xl">⏱️</p>
       <p className="mt-1 text-2xl font-black text-amber-800">{big}</p>
       <p className="text-sm text-amber-700">
@@ -194,9 +194,12 @@ export default function Home() {
 
   /** "New dictation": fresh empty word list, ready to fill three ways. */
   const startFresh = () => {
-    if (items.length > 0 && !window.confirm("Start a brand-new empty word list? Unsaved words will be gone! 🗑️")) return;
+    if (items.length > 0 && !window.confirm("Start a brand-new empty word list? Unsaved words will be gone! ️")) return;
     setItems([]);
-    setStaged(null);
+    setStaged((prev) => {
+      if (prev) URL.revokeObjectURL(prev.url);
+      return null;
+    });
     setError(null);
     setLoadedId(null);
     setAppendMode(false);
@@ -253,7 +256,7 @@ export default function Home() {
         return [...prev, ...result.map((it, i) => ({ ...it, id: base + i + 1 }))];
       });
       setAppendMode(false);
-      if (result.length === 0) setError("No words found — try a clearer photo! 📷");
+      if (result.length === 0) setError("No words found — try a clearer photo! ");
       setScreen("review");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Reading failed");
@@ -309,7 +312,7 @@ export default function Home() {
       setSavedFlash(true);
       setTimeout(() => setSavedFlash(false), 2500);
     } catch {
-      setError("Couldn't save — this browser blocks saving. 😢");
+      setError("Couldn't save — this browser blocks saving. ");
     } finally {
       setSaving(false);
     }
@@ -326,12 +329,14 @@ export default function Home() {
   };
 
   const handleDeleteEntry = async (id: string) => {
+    const entry = entries.find((e) => e.id === id);
+    if (!window.confirm(`Delete ${entry?.name ?? "this dictation"}? This can't be undone.`)) return;
     try {
       await deleteEntry(id);
       if (loadedId === id) setLoadedId(null);
       await refreshEntries();
     } catch {
-      setError("Couldn't delete — try again! 😢");
+      setError("Couldn't delete — try again! ");
     }
   };
 
@@ -349,11 +354,11 @@ export default function Home() {
       await renameEntry(id, name);
       await refreshEntries();
     } catch {
-      setError("Couldn't rename — try again! 😢");
+      setError("Couldn't rename — try again! ");
     }
   };
 
-  /** Retry round: dictate just the ❌-marked words, renumbered. Repeatable until all ✅. */
+  /** Retry round: dictate just the -marked words, renumbered. Repeatable until all . */
   const handleRetryWrong = () => {
     if (wrongItems.length === 0) return;
     setItems(wrongItems.map((it, i) => ({ ...it, id: i + 1 })));
@@ -374,24 +379,23 @@ export default function Home() {
 
       {screen === "home" && (
         <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
-          <p className="text-7xl">🦉</p>
           <h1 className="mt-2 text-3xl font-black">Inky Pup Dictation</h1>
-          <p className="mt-1 text-lg text-slate-500">Let&apos;s practise! 🎉</p>
+          <p className="mt-1 text-lg text-slate-500">Let&apos;s practise!</p>
           <div className="mt-6 flex flex-col gap-3">
             <button
               onClick={startFresh}
-              className="btn-kid rounded-3xl bg-green-500 px-4 py-5 text-2xl font-black text-white shadow-lg hover:bg-green-600"
+              className="btn-kid rounded-2xl bg-green-500 px-4 py-5 text-2xl font-black text-white shadow-lg hover:bg-green-600"
             >
-              📝 New dictation
+              New dictation
             </button>
             <button
               onClick={goLibrary}
-              className="btn-kid rounded-3xl bg-purple-500 px-4 py-5 text-2xl font-black text-white shadow-lg hover:bg-purple-600"
+              className="btn-kid rounded-2xl bg-purple-500 px-4 py-5 text-2xl font-black text-white shadow-lg hover:bg-purple-600"
             >
-              📚 My dictations{entries.length > 0 ? ` (${entries.length})` : ""}
+              My dictations{entries.length > 0 ? ` (${entries.length})` : ""}
             </button>
           </div>
-          <p className="mt-6 text-sm text-slate-400">🔒 Everything stays on this device — no internet needed!</p>
+          <p className="mt-6 text-sm text-slate-400">Everything stays on this device — no internet needed!</p>
         </section>
       )}
       {screen === "home" && <ReceivePanel onImport={handleImportShared} />}
@@ -420,7 +424,7 @@ export default function Home() {
         <>
           {loading ? (
             <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
-              <p className="animate-bounce text-7xl">🔍</p>
+
               <h2 className="mt-2 text-2xl font-black">Reading your photo…</h2>
               <p className="mt-2 text-4xl font-black text-amber-500">
                 {progress ? `${Math.round(progress.progress * 100)}%` : "…"}
@@ -443,13 +447,12 @@ export default function Home() {
           )}
           {error && !loading && (
             <div className="rounded-3xl bg-red-50 p-6 text-center shadow-sm">
-              <p className="text-5xl">😅</p>
               <p className="mt-2 text-xl font-black text-red-600">Oops! {error}</p>
               <button
                 onClick={loadDemo}
                 className="btn-kid mt-3 rounded-2xl bg-white px-4 py-3 text-lg font-black text-slate-600 shadow hover:bg-slate-50"
               >
-                Try demo words instead 🚀
+                Try demo words instead
               </button>
             </div>
           )}
@@ -473,7 +476,7 @@ export default function Home() {
           <SharePanel items={items} settings={settings} />
           {savedFlash && (
             <p className="rounded-2xl bg-green-100 p-3 text-center text-lg font-black text-green-700">
-              Saved! 🎉 Find it in 📚 My dictations.
+              Saved! Find it in My dictations.
             </p>
           )}
           <div className="flex flex-col gap-3">
@@ -490,7 +493,7 @@ export default function Home() {
                 disabled={items.length === 0 || saving}
                 className="btn-kid flex-1 rounded-2xl bg-blue-500 px-4 py-3 text-lg font-black text-white shadow-lg hover:bg-blue-600 disabled:opacity-40"
               >
-                {saving ? "Saving…" : "💾 Save"}
+                {saving ? "Saving…" : " Save"}
               </button>
             </div>
             <button
@@ -498,7 +501,7 @@ export default function Home() {
               disabled={items.length === 0}
               className="btn-kid rounded-2xl bg-green-500 px-4 py-4 text-2xl font-black text-white shadow-lg hover:bg-green-600 disabled:opacity-40"
             >
-              Next! 👉
+              Next! 
             </button>
           </div>
         </>
@@ -509,7 +512,7 @@ export default function Home() {
           <SpeechWarning onDismiss={() => {/* noop */}} />
           {loadedEntry && (
             <p className="rounded-2xl bg-white/80 p-2 text-center text-sm font-bold text-slate-500 shadow-sm">
-              🔊 Voice will be remembered for “{loadedEntry.name}”
+               Voice will be remembered for “{loadedEntry.name}”
             </p>
           )}
           <KidSettings settings={settings} setSettings={setSettings} />
@@ -537,7 +540,7 @@ export default function Home() {
           </div>
           {!speechSupported() && (
             <p className="text-center text-sm text-amber-600">
-              🎤 Web Speech API not available — some dictation features will be limited
+               Web Speech API not available — some dictation features will be limited
             </p>
           )}
         </>
@@ -556,11 +559,9 @@ export default function Home() {
       {screen === "done" && (
         <>
           <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
-            <p className="animate-bounce text-7xl">🎉</p>
-            <p className="mt-2 text-4xl">⭐⭐⭐</p>
             <h1 className="mt-2 text-3xl font-black">Amazing work!</h1>
             <p className="mt-1 text-lg text-slate-500">
-              You finished {items.length} words! So proud of you! 🥳
+              You finished {items.length} words! So proud of you!
             </p>
           </section>
           <AnswerCheck
@@ -576,7 +577,7 @@ export default function Home() {
                   onClick={handleRetryWrong}
                   className="btn-kid rounded-2xl bg-amber-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-amber-600"
                 >
-                  💪 Practise my {wrongItems.length} missed word{wrongItems.length > 1 ? "s" : ""}!
+                  Practise missed words ({wrongItems.length})
                 </button>
               )}
               <button
@@ -586,26 +587,26 @@ export default function Home() {
                 }}
                 className="btn-kid rounded-2xl bg-green-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-green-600"
               >
-                🔁 Practise again
+                Practise again
               </button>
               <button
                 onClick={() => setScreen("review")}
                 className="btn-kid rounded-2xl bg-purple-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-purple-600"
               >
-                ✅ Check words
+                Check words
               </button>
               <div className="flex gap-2">
                 <button
                   onClick={startFresh}
                   className="btn-kid flex-1 rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
                 >
-                  📝 New
+                  New
                 </button>
                 <button
                   onClick={goLibrary}
                   className="btn-kid flex-1 rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
                 >
-                  📚 Library
+                  Library
                 </button>
               </div>
             </div>

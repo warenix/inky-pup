@@ -17,12 +17,12 @@ export default function ReceivePanel({ onImport }: Props) {
     setError(null);
     try {
       const code = extractShareCode(raw);
-      if (!code) throw new Error("That doesn't look like a share link 😅");
+      if (!code) throw new Error("That doesn't look like a share link ");
       const { items, settings } = decodeShare(code);
       clearShareFromLocation();
       onImport(items, settings);
     } catch {
-      setError("Couldn't open that link — check it was copied fully! 😅");
+      setError("Couldn't open that link — check it was copied fully! ");
     }
   };
 
@@ -46,20 +46,20 @@ export default function ReceivePanel({ onImport }: Props) {
         const raw = await file.text();
         importCode(raw);
       } catch {
-        setError("Couldn't read that file 😅");
+        setError("Couldn't read that file ");
       }
     }
   };
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">📥 Got a share?</h2>
+      <h2 className="text-center text-2xl font-black"> Got a share?</h2>
       <p className="mt-1 text-center text-slate-500">Paste the link your teacher sent you!</p>
       <div className="mt-3 flex gap-2">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Paste share link here… 🔗"
+          placeholder="Paste share link here…"
           className="min-w-0 flex-1 rounded-2xl border-4 border-slate-200 px-3 py-3 text-base"
         />
         <button
@@ -67,14 +67,14 @@ export default function ReceivePanel({ onImport }: Props) {
           disabled={!text.trim()}
           className="btn-kid shrink-0 rounded-2xl bg-green-500 px-4 py-3 text-lg font-black text-white shadow hover:bg-green-600 disabled:opacity-40"
         >
-          Open! 🚀
+          Open!
         </button>
       </div>
       <button
         onClick={() => fileRef.current?.click()}
         className="btn-kid mt-2 w-full rounded-2xl border-4 border-slate-200 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
       >
-        📁 Load from file instead
+        Load from file instead
       </button>
       <input
         ref={fileRef}

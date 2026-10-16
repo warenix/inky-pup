@@ -49,9 +49,9 @@ export default function ReviewStep({ items, setItems }: Props) {
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">✅ Check the words!</h2>
+      <h2 className="text-center text-2xl font-black"> Check the words!</h2>
       <p className="mt-1 text-center text-slate-500">
-        Tap ▲ ▼ to move words around, fix typos here! 🔍
+        Tap ▲ ▼ to move words around, fix typos here! 
       </p>
       <ul className="mt-4 space-y-3">
         {items.map((it) => (
@@ -95,7 +95,7 @@ export default function ReviewStep({ items, setItems }: Props) {
         ))}
       </ul>
       {items.length === 0 && (
-        <p className="mt-4 text-center text-slate-400">No words yet — add your first one below! 👇</p>
+        <p className="mt-4 text-center text-slate-400">No words yet — add your first one below! </p>
       )}
 
       {editingId !== null && (

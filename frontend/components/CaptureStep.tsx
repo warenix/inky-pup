@@ -9,7 +9,18 @@ export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: F
 
   const handleFile = (f: File | undefined) => {
     if (!f) return;
-    setPreview(URL.createObjectURL(f));
+    if (!f.type.startsWith("image/")) {
+      alert("That doesn't look like a picture. Please pick an image! ");
+      return;
+    }
+    if (f.size > 25 * 1024 * 1024) {
+      alert("That picture is a bit too big — under 25 MB please! ");
+      return;
+    }
+    setPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(f);
+    });
     onFile(f);
   };
 
@@ -21,13 +32,13 @@ export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: F
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">📷 Take a photo!</h2>
+      <h2 className="text-center text-2xl font-black"> Take a photo!</h2>
       <p className="mt-1 text-center text-slate-500">
-        Snap your dictation sheet. Lay it flat — ask a grown-up to help! 🙏
+        Snap your dictation sheet. Lay it flat — ask a grown-up to help! 
       </p>
       {appendCount > 0 && (
         <p className="mx-auto mt-2 w-fit rounded-full bg-green-100 px-4 py-1 text-center font-black text-green-700">
-          ✅ New words will join your {appendCount} words!
+           New words will join your {appendCount} words!
         </p>
       )}
 
@@ -49,21 +60,19 @@ export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: F
         {preview ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={preview} alt="Dictation sheet preview" className="max-h-64 rounded-2xl object-contain" />
-        ) : (
-          <p className="text-6xl">📝</p>
-        )}
+        ) : null}
         <div className="mt-4 flex w-full flex-col gap-3">
           <button
             onClick={() => cameraRef.current?.click()}
             className="btn-kid rounded-2xl bg-blue-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-blue-600"
           >
-            📷 Take photo
+            Take photo
           </button>
           <button
             onClick={() => fileRef.current?.click()}
             className="btn-kid rounded-2xl border-4 border-blue-400 bg-white px-4 py-3 text-xl font-black text-blue-500 hover:bg-blue-50"
           >
-            🖼️ Choose picture
+            Choose picture
           </button>
         </div>
         {/* Camera-first picker (mobile opens the camera directly) */}

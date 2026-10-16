@@ -71,7 +71,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
     <section className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="text-center text-2xl font-black">✏️ Circle the words!</h2>
       <p className="mt-1 text-center text-slate-500">
-        Draw {regions.length === 0 ? "a box" : "more boxes"} around the words with your finger! 👆
+        Draw {regions.length === 0 ? "a box" : "more boxes"} around the words with your finger! 
         Leave a little space around the letters.
       </p>
 
@@ -82,7 +82,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
             mode === "lines" ? "bg-white shadow" : "text-slate-500"
           }`}
         >
-          📝 Sentences
+          Sentences
         </button>
         <button
           onClick={() => setMode("words")}
@@ -90,13 +90,13 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
             mode === "words" ? "bg-white shadow" : "text-slate-500"
           }`}
         >
-          🔤 Words
+          Words
         </button>
       </div>
       <p className="mt-1 text-center text-sm text-slate-400">
         {mode === "words"
-          ? "Pick this for word lists — one word at a time! 🔤"
-          : "Pick this for sentences — long lines! 📝"}
+          ? "Pick this for word lists — one word at a time! "
+          : "Pick this for sentences — long lines! "}
       </p>
 
       <div
@@ -164,14 +164,14 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
           disabled={regions.length === 0 || scanning}
           className="btn-kid rounded-2xl bg-green-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-green-600 disabled:opacity-40"
         >
-          🔍 Read {regions.length === 0 ? "my drawing!" : `${regions.length} box${regions.length > 1 ? "es" : ""}!`}
+          Read {regions.length === 0 ? "my drawing!" : `${regions.length} box${regions.length > 1 ? "es" : ""}!`}
         </button>
         <button
           onClick={() => onConfirm(null, mode)}
           disabled={scanning}
           className="btn-kid rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50 disabled:opacity-40"
         >
-          📄 Read the whole photo
+          Read the whole photo
         </button>
         {regions.length > 0 && (
           <button
@@ -182,7 +182,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
             disabled={scanning}
             className="rounded-2xl px-3 py-2 text-base text-slate-500 hover:bg-slate-100 disabled:opacity-40"
           >
-            🧹 Start over
+            Start over
           </button>
         )}
       </div>

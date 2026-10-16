@@ -23,27 +23,27 @@ export default function AddWords({ count, onManual, onPhotoFile }: Props) {
     <section className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="text-center text-2xl font-black">➕ Add more words!</h2>
       <p className="mt-1 text-center text-slate-500">
-        {count === 0 ? "Start your list — pick one! 👇" : "Keep growing your list! 🌱"}
+        {count === 0 ? "Start your list — pick one! " : "Keep growing your list! "}
       </p>
       <div className="mt-4 flex flex-col gap-3">
         <button
           onClick={onManual}
           className="btn-kid rounded-2xl bg-purple-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-purple-600"
         >
-          ✏️ Write it myself
+          Write it myself
         </button>
         <div className="flex gap-2">
           <button
             onClick={() => cameraRef.current?.click()}
-            className="btn-kid flex-1 rounded-2xl bg-blue-500 px-4 py-3 text-lg font-black text-white shadow-lg hover:bg-blue-600"
+            className="btn-kid flex-1 rounded-2xl bg-blue-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-blue-600"
           >
-            📷 Photo
+            Photo
           </button>
           <button
             onClick={() => fileRef.current?.click()}
-            className="btn-kid flex-1 rounded-2xl border-4 border-blue-400 bg-white px-4 py-3 text-lg font-black text-blue-500 hover:bg-blue-50"
+            className="btn-kid flex-1 rounded-2xl border-4 border-blue-400 bg-white px-4 py-4 text-xl font-black text-blue-500 hover:bg-blue-50"
           >
-            🖼️ Upload
+            Upload
           </button>
         </div>
       </div>

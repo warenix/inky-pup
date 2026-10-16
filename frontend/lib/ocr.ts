@@ -517,23 +517,28 @@ export async function scanDictationImage(
   mode: OcrMode = "lines"
 ): Promise<DictationItem[]> {
   const worker = await getWorker(onProgress);
-  const preprocessed = await preprocessImage(image);
-  const { data }: { data: OcrBlocks } = await worker.recognize(
-    preprocessed,
-    {},
-    { blocks: true }
-  );
+  try {
+    const preprocessed = await preprocessImage(image);
+    const { data }: { data: OcrBlocks } = await worker.recognize(
+      preprocessed,
+      {},
+      { blocks: true }
+    );
+    if ((data.blocks ?? []).length > 0) {
+      return mode === "words"
+        ? blocksToWordItems(data)
+        : blocksToLineItems(data);
+    }
 
-  if ((data.blocks ?? []).length > 0) {
-    return mode === "words"
-      ? blocksToWordItems(data)
-      : blocksToLineItems(data);
+    // Fallback: plain-text lines (same cleaning).
+    return data.text
+      .split("\n")
+      .map(cleanLineText)
+      .filter((t) => t.length > 0)
+      .map((text, i) => ({ id: i + 1, text }));
+  } catch (e) {
+    // Drop the (possibly corrupted) worker so the next scan re-initialises.
+    workerPromise = null;
+    throw e;
   }
-
-  // Fallback: plain-text lines (same cleaning).
-  return data.text
-    .split("\n")
-    .map(cleanLineText)
-    .filter((t) => t.length > 0)
-    .map((text, i) => ({ id: i + 1, text }));
 }

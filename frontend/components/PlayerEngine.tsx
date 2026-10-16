@@ -92,7 +92,9 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
       const ok = await playItem(i, id);
       if (!ok || runId.current !== id) return;
     }
+    if (runId.current !== id) return;
     setPhase("done");
+    onFinish();
   }
 
   /** Play one item fully (chunks + repeats + writing time). False if superseded. */
@@ -163,9 +165,8 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
   if (items.length === 0) {
     return (
       <section className="rounded-3xl bg-white p-6 text-center shadow-sm">
-        <p className="text-6xl">📭</p>
         <h2 className="mt-2 text-2xl font-black">No words yet!</h2>
-        <p className="mt-1 text-slate-500">Go back and add some words first. 📷</p>
+        <p className="mt-1 text-slate-500">Go back and add some words first. </p>
       </section>
     );
   }
@@ -174,31 +175,30 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
   const chunks = itemChunks[index] ?? [];
   const chunk = chunks[chunkIdx];
   const multiChunk = chunks.length > 1 && chunk && current;
-  // Self-practice mode: answers stay hidden until the end (hold 👀 to peek).
+  // Self-practice mode: answers stay hidden until the end (hold  to peek).
   const hiding = settings.hideWords !== false && phase !== "done" && !peek;
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">🎧 Listen and write!</h2>
+      <h2 className="text-center text-2xl font-black"> Listen and write!</h2>
 
       <div className="mt-3 h-4 overflow-hidden rounded-full bg-slate-100">
         <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-green-400 transition-all" style={{ width: `${progress}%` }} />
       </div>
       <p className="mt-1 text-center text-lg font-black text-purple-600">
-        ⭐ Word {Math.min(index + 1, items.length)} of {items.length}
-        {phase === "speaking" && ` · 🗣️ ${repeat}/${settings.repeatCount}`}
-        {phase === "speaking" && multiChunk ? ` · 🧩 Part ${chunkIdx + 1}/${chunks.length}` : ""}
+        Word {Math.min(index + 1, items.length)} of {items.length}
+        {phase === "speaking" && ` · ${repeat}/${settings.repeatCount}`}
+        {phase === "speaking" && multiChunk ? ` · Part ${chunkIdx + 1}/${chunks.length}` : ""}
       </p>
 
       <div className="mt-3 flex min-h-44 flex-col justify-center rounded-3xl bg-purple-50 p-6 text-center">
         {phase === "done" ? (
-          <p className="mt-2 text-4xl font-black">🎉</p>
+          <p className="mt-2 text-4xl font-black">Done!</p>
         ) : hiding ? (
           <>
-            <p className="mt-2 text-7xl">🙈</p>
-            {phase === "idle" && <p className="mt-2 text-xl font-black">No peeking! Get your ✏️ ready…</p>}
-            {phase === "speaking" && <p className="mt-2 text-xl font-black">🎧 Listen carefully…</p>}
-            {phase === "paused" && <p className="mt-2 text-xl font-black text-amber-600">⏸️ Paused — take a breath!</p>}
+            {phase === "idle" && <p className="mt-2 text-xl font-black">No peeking! Get your pencil ready…</p>}
+            {phase === "speaking" && <p className="mt-2 text-xl font-black">Listen carefully…</p>}
+            {phase === "paused" && <p className="mt-2 text-xl font-black text-amber-600">Paused — take a breath!</p>}
           </>
         ) : multiChunk ? (
           <p className="mt-2 text-3xl font-black leading-snug">
@@ -210,7 +210,7 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
           <p className="mt-2 text-4xl font-black">{current?.text}</p>
         )}
         {phase === "idle" && <p className="mt-2 text-lg text-slate-500">Get your ✏️ pencil ready…</p>}
-        {phase === "speaking" && <p className="mt-2 text-lg text-slate-500">🎧 Listen carefully…</p>}
+        {phase === "speaking" && <p className="mt-2 text-lg text-slate-500">Listen carefully…</p>}
         {phase === "writing" && (
           <p className="mt-3 text-6xl font-black tabular-nums text-blue-600">{countdown}s</p>
         )}
@@ -231,7 +231,7 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
         )}
         {phase !== "idle" && phase !== "done" && (
           <button onClick={repeatCurrent} className="btn-kid rounded-2xl bg-purple-500 px-4 py-4 text-2xl font-black text-white shadow-lg hover:bg-purple-600">
-            🔂 This word again!
+            This word again!
           </button>
         )}
         <div className="flex gap-2">
@@ -262,7 +262,7 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
             onContextMenu={(e) => e.preventDefault()}
             className="touch-none select-none rounded-2xl border-4 border-dashed border-purple-300 bg-white px-3 py-2 text-base font-black text-purple-500"
           >
-            👀 Hold to peek!
+            Hold to peek!
           </button>
         )}
       </div>
