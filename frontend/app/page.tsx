@@ -21,6 +21,8 @@ import { deleteEntry, listEntries, renameEntry, saveEntry, updateEntry, type Dic
 import { clearShareFromLocation, parseShareFromLocation } from "../lib/share";
 import { estimateSeconds, formatEstimate } from "../lib/estimate";
 import { DEFAULT_SETTINGS, type DictationItem, type TeacherSettings } from "../lib/types";
+import { speechSupported } from "../lib/speech";
+import SpeechWarning from "../components/SpeechWarning";
 
 type Screen = "home" | "library" | "scan" | "areas" | "review" | "ready" | "play" | "done";
 type Flow = "scan" | "library";
@@ -504,6 +506,7 @@ export default function Home() {
 
       {screen === "ready" && (
         <>
+          <SpeechWarning onDismiss={() => {/* noop */}} />
           {loadedEntry && (
             <p className="rounded-2xl bg-white/80 p-2 text-center text-sm font-bold text-slate-500 shadow-sm">
               🔊 Voice will be remembered for “{loadedEntry.name}”
@@ -520,6 +523,7 @@ export default function Home() {
                 setScreen("play");
               }}
               className="btn-kid rounded-2xl bg-green-500 px-4 py-4 text-2xl font-black text-white shadow-lg hover:bg-green-600"
+              disabled={!speechSupported()}
             >
               ▶ Start!
             </button>
@@ -531,6 +535,11 @@ export default function Home() {
               label="← Check words"
             />
           </div>
+          {!speechSupported() && (
+            <p className="text-center text-sm text-amber-600">
+              🎤 Web Speech API not available — some dictation features will be limited
+            </p>
+          )}
         </>
       )}
 
