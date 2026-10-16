@@ -84,7 +84,7 @@ export default function SharePanel({ items, settings }: Props) {
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black"> Share</h2>
+      <h2 className="text-center text-2xl font-black">📤 Share</h2>
       <p className="mt-1 text-center text-slate-500">
         Send to another device — no account, link holds the words!
       </p>
@@ -92,13 +92,13 @@ export default function SharePanel({ items, settings }: Props) {
         <div className="flex gap-2">
           <button
             onClick={copyLink}
-            className="btn-kid flex-1 rounded-2xl bg-purple-500 px-4 py-3 text-lg font-black text-white shadow hover:bg-purple-600"
+            className="btn-action-md flex-1 bg-purple-500 text-white hover:bg-purple-600"
           >
             {copied ? "Copied!" : "Copy link"}
           </button>
           <button
             onClick={() => setShowQR((v) => !v)}
-            className="btn-kid flex-1 rounded-2xl bg-amber-400 px-4 py-3 text-lg font-black text-amber-900 shadow hover:bg-amber-500"
+            className="btn-action-md flex-1 bg-amber-400 text-amber-900 hover:bg-amber-500"
           >
             {showQR ? "Hide QR" : "Show QR"}
           </button>
@@ -106,14 +106,14 @@ export default function SharePanel({ items, settings }: Props) {
         {typeof navigator !== "undefined" && "share" in navigator && (
           <button
             onClick={() => void shareNative()}
-            className="btn-kid rounded-2xl border-4 border-slate-200 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
+            className="btn-action-md w-full border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
           >
             Send via chat…
           </button>
         )}
         <button
           onClick={downloadJson}
-          className="btn-kid rounded-2xl border-4 border-slate-200 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
+          className="btn-action-md w-full border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
         >
           Download file (for long lists)
         </button>

@@ -1,4 +1,4 @@
-import { chunkSentence, singleChunk } from "./chunks";
+import { chunkSentence, estimateAudioSeconds, repeatPauseSeconds, singleChunk } from "./chunks";
 import { expandPunctuation } from "./speech";
 import type { DictationItem, TeacherSettings } from "./types";
 
@@ -6,10 +6,6 @@ import type { DictationItem, TeacherSettings } from "./types";
  * Estimated playback duration, mirroring exactly what the player does:
  * same chunks, same repeats/pauses, same punctuation announcements.
  */
-
-const CJK_RE = /[\u3400-\u9FFF]/;
-const CPS_CJK = 5; // spoken chars per second at 1x speed
-const CPS_LATIN = 14;
 
 export function estimateSeconds(
   items: DictationItem[],
@@ -24,12 +20,13 @@ export function estimateSeconds(
         settings.sayPunctuation === false
           ? c.text
           : expandPunctuation(c.text, settings.lang);
-      const cps = CJK_RE.test(spoken) ? CPS_CJK : CPS_LATIN;
       total +=
-        ((spoken.length / cps / settings.rate) * settings.repeatCount +
-          settings.pauseInterval * (settings.repeatCount - 1));
+        (estimateAudioSeconds(spoken) / settings.rate) * settings.repeatCount +
+        repeatPauseSeconds(c.text, settings) * (settings.repeatCount - 1);
     }
-    if (chunks.length > 1) total += settings.pauseInterval * (chunks.length - 1);
+    if (chunks.length > 1) {
+      total += repeatPauseSeconds(chunks[chunks.length - 2].text, settings);
+    }
     total += settings.writingTime;
   }
   return Math.max(0, Math.round(total));

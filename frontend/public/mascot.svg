@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8F4FD" />
+      <stop offset="100%" stop-color="#D0E7FF" />
+    </radialGradient>
+    
+    <!-- Fur Gradient -->
+    <linearGradient id="furGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3A3D42" />
+      <stop offset="100%" stop-color="#1A1C1F" />
+    </linearGradient>
+
+    <!-- Inner Ear Pink -->
+    <linearGradient id="earPink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB6C1" />
+      <stop offset="100%" stop-color="#FF8598" />
+    </linearGradient>
+
+    <!-- Shadow Filter -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="200" cy="200" r="170" fill="url(#bgGrad)" />
+
+  <!-- Decorative Background Ink Splatters -->
+  <circle cx="90" cy="120" r="8" fill="#2A2D35" opacity="0.1" />
+  <circle cx="310" cy="280" r="12" fill="#2A2D35" opacity="0.1" />
+  <path d="M 300 110 C 310 100 325 110 320 125 C 315 140 295 130 300 110 Z" fill="#2A2D35" opacity="0.1" />
+
+  <!-- Graduation Cap (Scholar theme for students) -->
+  <g id="cap" filter="url(#dropShadow)">
+    <!-- Cap Diamond / Top -->
+    <polygon points="200,65 310,95 200,125 90,95" fill="#2C3E50" />
+    <polygon points="200,70 300,95 200,120 100,95" fill="#34495E" />
+    <!-- Cap Skull Cap / Band -->
+    <path d="M 155 110 L 155 130 C 155 142 245 142 245 130 L 245 110 Z" fill="#2C3E50" />
+    <!-- Tassel String -->
+    <path d="M 200 95 Q 260 110 275 145" fill="none" stroke="#F1C40F" stroke-width="4" stroke-linecap="round" />
+    <!-- Ink Drop Tassel -->
+    <path d="M 275 145 C 265 165 285 175 285 185 C 285 195 265 195 275 145 Z" fill="#1A1C1F" />
+  </g>
+
+  <!-- Left Floppy Ear -->
+  <path d="M 125 170 C 75 170 55 240 85 285 C 105 310 135 260 140 215 Z" fill="url(#furGrad)" filter="url(#dropShadow)" />
+  <path d="M 115 185 C 80 185 70 240 95 270 C 110 285 125 240 125 205 Z" fill="url(#earPink)" opacity="0.85" />
+
+  <!-- Right Floppy Ear -->
+  <path d="M 275 170 C 325 170 345 240 315 285 C 295 310 265 260 260 215 Z" fill="url(#furGrad)" filter="url(#dropShadow)" />
+  <path d="M 285 185 C 320 185 330 240 305 270 C 290 285 275 240 275 205 Z" fill="url(#earPink)" opacity="0.85" />
+
+  <!-- Big Pup Head Base -->
+  <circle cx="200" cy="205" r="92" fill="url(#furGrad)" filter="url(#dropShadow)" />
+
+  <!-- Cheeks Puff (Extra Kawaii Width) -->
+  <ellipse cx="145" cy="235" rx="32" ry="26" fill="url(#furGrad)" />
+  <ellipse cx="255" cy="235" rx="32" ry="26" fill="url(#furGrad)" />
+
+  <!-- White Muzzle Patch -->
+  <ellipse cx="200" cy="225" rx="46" ry="34" fill="#FFFFFF" />
+
+  <!-- Nose -->
+  <path d="M 188 206 C 188 200 194 198 200 202 C 206 198 212 200 212 206 C 212 215 200 222 200 222 C 200 222 188 215 188 206 Z" fill="#212529" />
+
+  <!-- Smile / Mouth -->
+  <path d="M 188 230 Q 200 240 200 230 Q 200 240 212 230" fill="none" stroke="#212529" stroke-width="3.5" stroke-linecap="round" />
+  <!-- Tongue -->
+  <path d="M 193 234 Q 200 246 207 234 Z" fill="#FF7085" />
+
+  <!-- Big Expressive Eyes -->
+  <!-- Left Eye -->
+  <g id="leftEye">
+    <ellipse cx="158" cy="180" rx="18" ry="25" fill="#212529" />
+    <circle cx="152" cy="170" rx="7" ry="9" fill="#FFFFFF" />
+    <circle cx="164" cy="192" r="3.5" fill="#FFFFFF" />
+  </g>
+
+  <!-- Right Eye -->
+  <g id="rightEye">
+    <ellipse cx="242" cy="180" rx="18" ry="25" fill="#212529" />
+    <circle cx="236" cy="170" rx="7" ry="9" fill="#FFFFFF" />
+    <circle cx="248" cy="192" r="3.5" fill="#FFFFFF" />
+  </g>
+
+  <!-- Eyebrows -->
+  <path d="M 142 152 Q 158 142 174 154" fill="none" stroke="#4A4E55" stroke-width="4.5" stroke-linecap="round" />
+  <path d="M 226 154 Q 242 142 258 152" fill="none" stroke="#4A4E55" stroke-width="4.5" stroke-linecap="round" />
+
+  <!-- Rosy Cheeks -->
+  <ellipse cx="132" cy="210" rx="12" ry="7" fill="#FF9EAA" opacity="0.6" />
+  <ellipse cx="268" cy="210" rx="12" ry="7" fill="#FF9EAA" opacity="0.6" />
+
+  <!-- Cute Ink Smudge on Cheek -->
+  <path d="M 258 222 C 263 216 272 220 268 228 C 264 232 255 228 258 222 Z" fill="#1A1C1F" opacity="0.75" />
+</svg>

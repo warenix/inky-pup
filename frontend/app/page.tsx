@@ -114,7 +114,7 @@ function BackButton({ onClick, label = "← Back" }: { onClick: () => void; labe
   return (
     <button
       onClick={onClick}
-      className="btn-kid rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-500 hover:bg-slate-50"
+      className="btn-back"
     >
       {label}
     </button>
@@ -186,11 +186,54 @@ export default function Home() {
     setWrongItems([]);
   }, [items]);
 
+  // Start every screen at the top so nothing hides below the fold.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [screen]);
+
+  // ---- validation ----
+  // A dictation can only run with words the voice can actually read, so rows
+  // left blank (or holding only spaces / punctuation) must be dealt with first.
+  const blankRows = items.filter((it) => !it.text.trim());
+  const blankIds = blankRows.map((it) => it.id);
+  const hasList = items.length > 0;
+  const canPractise = hasList && blankRows.length === 0;
+  const blankWarning =
+    blankRows.length === 1
+      ? `Word ${blankRows[0].id} is still empty — type it or press ✕ to delete it.`
+      : `${blankRows.length} words are still empty — type them or press ✕ to delete them.`;
+
   // ---- navigation ----
   const goLibrary = () => {
     setScreen("library");
   };
   const goHome = () => setScreen("home");
+
+  /** Words -> Ready. Refuses to advance while any row is empty. */
+  const goReady = () => {
+    if (!hasList) {
+      setError("Add some words before you start! ");
+      return;
+    }
+    if (blankRows.length > 0) {
+      setError(blankWarning);
+      return;
+    }
+    setError(null);
+    setScreen("ready");
+  };
+
+  /** Ready -> Play. Final gate so a blank list can never reach the voice. */
+  const goPlay = () => {
+    if (!canPractise) {
+      setError(hasList ? blankWarning : "Add some words before you start! ");
+      setScreen("review");
+      return;
+    }
+    setError(null);
+    setPlayKey((k) => k + 1);
+    setScreen("play");
+  };
 
   /** "New dictation": fresh empty word list, ready to fill three ways. */
   const startFresh = () => {
@@ -379,20 +422,22 @@ export default function Home() {
 
       {screen === "home" && (
         <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
-          <h1 className="mt-2 text-3xl font-black">Inky Pup Dictation</h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mascot.svg" alt="Inky Pup mascot" className="mx-auto h-28 w-28 transition hover:scale-110" />
+          <h1 className="mt-2 text-3xl font-black">Inky Pup Dictation 🐾</h1>
           <p className="mt-1 text-lg text-slate-500">Let&apos;s practise!</p>
           <div className="mt-6 flex flex-col gap-3">
             <button
               onClick={startFresh}
-              className="btn-kid rounded-2xl bg-green-500 px-4 py-5 text-2xl font-black text-white shadow-lg hover:bg-green-600"
+              className="btn-action bg-green-500 text-white hover:bg-green-600"
             >
-              New dictation
+              📝 New dictation
             </button>
             <button
               onClick={goLibrary}
-              className="btn-kid rounded-2xl bg-purple-500 px-4 py-5 text-2xl font-black text-white shadow-lg hover:bg-purple-600"
+              className="btn-action bg-purple-500 text-white hover:bg-purple-600"
             >
-              My dictations{entries.length > 0 ? ` (${entries.length})` : ""}
+              📚 My dictations{entries.length > 0 ? ` (${entries.length})` : ""}
             </button>
           </div>
           <p className="mt-6 text-sm text-slate-400">Everything stays on this device — no internet needed!</p>
@@ -424,7 +469,8 @@ export default function Home() {
         <>
           {loading ? (
             <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
-
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/mascot.svg" alt="Inky Pup" className="mx-auto h-24 w-24 animate-bounce" />
               <h2 className="mt-2 text-2xl font-black">Reading your photo…</h2>
               <p className="mt-2 text-4xl font-black text-amber-500">
                 {progress ? `${Math.round(progress.progress * 100)}%` : "…"}
@@ -450,7 +496,7 @@ export default function Home() {
               <p className="mt-2 text-xl font-black text-red-600">Oops! {error}</p>
               <button
                 onClick={loadDemo}
-                className="btn-kid mt-3 rounded-2xl bg-white px-4 py-3 text-lg font-black text-slate-600 shadow hover:bg-slate-50"
+                className="btn-action-md mt-3 bg-white text-slate-600 hover:bg-slate-50"
               >
                 Try demo words instead
               </button>
@@ -479,30 +525,39 @@ export default function Home() {
               Saved! Find it in My dictations.
             </p>
           )}
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-2">
-              <div className="flex-1">
-                {/* No staged photo (e.g. opened from a shared link) → back goes
-                    to the photo screen, never a blank areas screen. */}
-                <BackButton
-                  onClick={() => setScreen(flow === "scan" ? (staged ? "areas" : "scan") : "library")}
-                />
-              </div>
-              <button
-                onClick={handleSaveEntry}
-                disabled={items.length === 0 || saving}
-                className="btn-kid flex-1 rounded-2xl bg-blue-500 px-4 py-3 text-lg font-black text-white shadow-lg hover:bg-blue-600 disabled:opacity-40"
-              >
-                {saving ? "Saving…" : " Save"}
-              </button>
-            </div>
-            <button
-              onClick={() => items.length > 0 && setScreen("ready")}
-              disabled={items.length === 0}
-              className="btn-kid rounded-2xl bg-green-500 px-4 py-4 text-2xl font-black text-white shadow-lg hover:bg-green-600 disabled:opacity-40"
+          {hasList && blankRows.length > 0 && (
+            <p
+              role="alert"
+              className="rounded-2xl border-4 border-amber-300 bg-amber-100 p-3 text-center text-base font-black text-amber-800"
             >
-              Next! 
+              {blankWarning}
+            </p>
+          )}
+          {error && screen === "review" && (
+            <p role="alert" className="rounded-2xl bg-red-50 p-3 text-center text-base font-black text-red-600">
+              {error}
+            </p>
+          )}
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={goReady}
+              disabled={!hasList}
+              className="btn-action bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
+            >
+              Next!
             </button>
+            <button
+              onClick={handleSaveEntry}
+              disabled={items.length === 0 || saving}
+              className="btn-action-md bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40"
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>
+            {/* No staged photo (e.g. opened from a shared link) → back goes
+                to the photo screen, never a blank areas screen. */}
+            <BackButton
+              onClick={() => setScreen(flow === "scan" ? (staged ? "areas" : "scan") : "library")}
+            />
           </div>
         </>
       )}
@@ -517,15 +572,20 @@ export default function Home() {
           )}
           <KidSettings settings={settings} setSettings={setSettings} />
           <EstimateCard items={items} settings={settings} />
-          <SharePanel items={items} settings={settings} />
           <div className="flex flex-col gap-3">
             <button
               onClick={() => {
+                if (!canPractise) {
+                  setError(hasList ? blankWarning : "Add some words before you start! ");
+                  setScreen("review");
+                  return;
+                }
                 void persistVoice();
+                setError(null);
                 setPlayKey((k) => k + 1);
                 setScreen("play");
               }}
-              className="btn-kid rounded-2xl bg-green-500 px-4 py-4 text-2xl font-black text-white shadow-lg hover:bg-green-600"
+              className="btn-action bg-green-500 text-white hover:bg-green-600"
               disabled={!speechSupported()}
             >
               ▶ Start!
@@ -558,8 +618,17 @@ export default function Home() {
 
       {screen === "done" && (
         <>
+          <div className="confetti" aria-hidden="true">
+            <span style={{ left: "12%", animationDelay: "0s" }}>🎉</span>
+            <span style={{ left: "28%", animationDelay: "0.15s" }}>⭐</span>
+            <span style={{ left: "50%", animationDelay: "0.3s" }}>✨</span>
+            <span style={{ left: "72%", animationDelay: "0.45s" }}>⭐</span>
+            <span style={{ left: "88%", animationDelay: "0.6s" }}>🎉</span>
+          </div>
           <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
-            <h1 className="mt-2 text-3xl font-black">Amazing work!</h1>
+            <h1 className="mt-2 text-3xl font-black">🎉 Amazing work! 🎉</h1>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/mascot.svg" alt="Inky Pup" className="mx-auto mt-3 h-24 w-24 animate-bounce" />
             <p className="mt-1 text-lg text-slate-500">
               You finished {items.length} words! So proud of you!
             </p>
@@ -575,7 +644,7 @@ export default function Home() {
               {wrongItems.length > 0 && (
                 <button
                   onClick={handleRetryWrong}
-                  className="btn-kid rounded-2xl bg-amber-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-amber-600"
+                  className="btn-action bg-amber-500 text-white hover:bg-amber-600"
                 >
                   Practise missed words ({wrongItems.length})
                 </button>
@@ -585,30 +654,17 @@ export default function Home() {
                   setPlayKey((k) => k + 1);
                   setScreen("play");
                 }}
-                className="btn-kid rounded-2xl bg-green-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-green-600"
+                className="btn-action bg-green-500 text-white hover:bg-green-600"
               >
                 Practise again
               </button>
               <button
-                onClick={() => setScreen("review")}
-                className="btn-kid rounded-2xl bg-purple-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-purple-600"
+                onClick={goLibrary}
+                className="btn-action-md w-full border-4 border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
               >
-                Check words
+                Library
               </button>
-              <div className="flex gap-2">
-                <button
-                  onClick={startFresh}
-                  className="btn-kid flex-1 rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
-                >
-                  New
-                </button>
-                <button
-                  onClick={goLibrary}
-                  className="btn-kid flex-1 rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
-                >
-                  Library
-                </button>
-              </div>
+              <BackButton onClick={() => setScreen("review")} label="← Check words" />
             </div>
           </section>
         </>

@@ -42,7 +42,7 @@ export default function LibraryPanel({ entries, loadedId, onLoad, onDelete, onRe
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black"> My dictations</h2>
+      <h2 className="text-center text-2xl font-black">📚 My dictations</h2>
       <p className="mt-1 text-center text-slate-500">Tap one to practise! ▶️</p>
       <ul className="mt-4 space-y-3">
         {entries.map((e) => (
@@ -101,7 +101,7 @@ export default function LibraryPanel({ entries, loadedId, onLoad, onDelete, onRe
                 <div className="mt-2 flex gap-2">
                   <button
                     onClick={() => onLoad(e)}
-                    className="btn-kid flex-1 rounded-2xl bg-green-500 px-3 py-2 text-lg font-black text-white hover:bg-green-600"
+                    className="btn-action-md flex-1 bg-green-500 text-white hover:bg-green-600"
                   >
                     {e.id === loadedId ? "Loaded ✓" : "▶ Practise!"}
                   </button>
@@ -110,7 +110,7 @@ export default function LibraryPanel({ entries, loadedId, onLoad, onDelete, onRe
                     aria-label={`Delete ${e.name}`}
                     className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-xl text-red-500 hover:bg-red-200"
                   >
-                    Delete
+                    🗑️
                   </button>
                 </div>
               </>

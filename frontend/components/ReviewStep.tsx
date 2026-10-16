@@ -49,7 +49,7 @@ export default function ReviewStep({ items, setItems }: Props) {
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black"> Check the words!</h2>
+      <h2 className="text-center text-2xl font-black">✅ Check the words!</h2>
       <p className="mt-1 text-center text-slate-500">
         Tap ▲ ▼ to move words around, fix typos here! 
       </p>
@@ -127,13 +127,13 @@ export default function ReviewStep({ items, setItems }: Props) {
             <div className="mt-3 flex gap-2">
               <button
                 onClick={closeEditor}
-                className="btn-kid flex-1 rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-500 hover:bg-slate-50"
+                className="btn-action-md flex-1 border-4 border-slate-300 bg-white text-slate-500 hover:bg-slate-50"
               >
                 ✕ Cancel
               </button>
               <button
                 onClick={saveEditor}
-                className="btn-kid flex-1 rounded-2xl bg-green-500 px-4 py-3 text-lg font-black text-white shadow-lg hover:bg-green-600"
+                className="btn-action-md flex-1 bg-green-500 text-white hover:bg-green-600"
               >
                 ✓ Done
               </button>

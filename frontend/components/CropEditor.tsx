@@ -162,14 +162,14 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
         <button
           onClick={() => onConfirm(orderRegions(regions), mode)}
           disabled={regions.length === 0 || scanning}
-          className="btn-kid rounded-2xl bg-green-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-green-600 disabled:opacity-40"
+          className="btn-action bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
         >
           Read {regions.length === 0 ? "my drawing!" : `${regions.length} box${regions.length > 1 ? "es" : ""}!`}
         </button>
         <button
           onClick={() => onConfirm(null, mode)}
           disabled={scanning}
-          className="btn-kid rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+          className="btn-action-md border-4 border-slate-300 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40"
         >
           Read the whole photo
         </button>

@@ -18,3 +18,66 @@ body {
   @apply transition active:scale-95;
   min-height: 3.5rem;
 }
+
+/* ---- Shared action system (used on every screen) ----
+   One big primary action, medium secondary actions, small helpers,
+   and a single just-fit back button. Colours are added per action. */
+
+/* Primary: one per screen, the biggest thing on the page. */
+.btn-action {
+  @apply transition w-full rounded-2xl px-4 py-4 text-2xl font-black shadow-lg active:scale-95;
+  min-height: 3.75rem;
+}
+
+/* Secondary: supporting actions, half the visual weight. */
+.btn-action-md {
+  @apply transition rounded-2xl px-4 py-3 text-lg font-black shadow-lg active:scale-95;
+  min-height: 3.5rem;
+}
+
+/* Helper: low-emphasis controls in dense areas (play screen). */
+.btn-action-sm {
+  @apply transition rounded-2xl px-3 py-2 text-base font-bold active:scale-95;
+  min-height: 3rem;
+}
+
+/* Back: always just-fit and always last. */
+.btn-back {
+  @apply transition w-fit rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-500 active:scale-95 hover:bg-slate-50;
+  min-height: 3.5rem;
+}
+
+/* Playful motion for a kid-friendly feel */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes pop {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-wiggle { animation: wiggle 1.6s ease-in-out infinite; }
+.animate-float { animation: float 2.4s ease-in-out infinite; }
+.animate-pop { animation: pop 0.35s ease-out; }
+.confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 40;
+}
+.confetti span {
+  position: absolute;
+  top: -10%;
+  font-size: 1.4rem;
+  animation: confetti-fall 1.8s ease-out forwards;
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(120%) rotate(360deg); opacity: 0; }
+}

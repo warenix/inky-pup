@@ -53,7 +53,7 @@ export default function ReceivePanel({ onImport }: Props) {
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black"> Got a share?</h2>
+      <h2 className="text-center text-2xl font-black">📥 Got a share?</h2>
       <p className="mt-1 text-center text-slate-500">Paste the link your teacher sent you!</p>
       <div className="mt-3 flex gap-2">
         <input
@@ -65,14 +65,14 @@ export default function ReceivePanel({ onImport }: Props) {
         <button
           onClick={() => text.trim() && importCode(text)}
           disabled={!text.trim()}
-          className="btn-kid shrink-0 rounded-2xl bg-green-500 px-4 py-3 text-lg font-black text-white shadow hover:bg-green-600 disabled:opacity-40"
+          className="btn-action-md shrink-0 bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
         >
           Open!
         </button>
       </div>
       <button
         onClick={() => fileRef.current?.click()}
-        className="btn-kid mt-2 w-full rounded-2xl border-4 border-slate-200 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
+        className="btn-action-md mt-2 w-full border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
       >
         Load from file instead
       </button>

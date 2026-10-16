@@ -8,7 +8,7 @@ export default function NotFound() {
       <p className="text-lg text-slate-500">That page wandered off!</p>
       <Link
         href="/"
-        className="btn-kid inline-block rounded-2xl bg-green-500 px-6 py-4 text-xl font-black text-white shadow-lg hover:bg-green-600"
+        className="btn-action bg-green-500 text-white hover:bg-green-600"
       >
         🏠 Home
       </Link>

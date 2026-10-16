@@ -32,7 +32,7 @@ export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: F
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black"> Take a photo!</h2>
+      <h2 className="text-center text-2xl font-black">📷 Take a photo!</h2>
       <p className="mt-1 text-center text-slate-500">
         Snap your dictation sheet. Lay it flat — ask a grown-up to help! 
       </p>
@@ -64,15 +64,15 @@ export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: F
         <div className="mt-4 flex w-full flex-col gap-3">
           <button
             onClick={() => cameraRef.current?.click()}
-            className="btn-kid rounded-2xl bg-blue-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-blue-600"
+            className="btn-action bg-blue-500 text-white hover:bg-blue-600"
           >
-            Take photo
+            📷 Take photo
           </button>
           <button
             onClick={() => fileRef.current?.click()}
-            className="btn-kid rounded-2xl border-4 border-blue-400 bg-white px-4 py-3 text-xl font-black text-blue-500 hover:bg-blue-50"
+            className="btn-action-md border-4 border-blue-400 bg-white text-blue-500 hover:bg-blue-50"
           >
-            Choose picture
+            🖼️ Choose picture
           </button>
         </div>
         {/* Camera-first picker (mobile opens the camera directly) */}
