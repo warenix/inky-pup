@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import AddWords from "../components/AddWords";
 import CaptureStep from "../components/CaptureStep";
 import CropEditor from "../components/CropEditor";
 import KidSettings from "../components/KidSettings";
@@ -136,6 +137,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [entries, setEntries] = useState<DictationEntry[]>([]);
   const [loadedId, setLoadedId] = useState<string | null>(null);
+  const [appendMode, setAppendMode] = useState(false);
   const [playKey, setPlayKey] = useState(0);
   const [savedFlash, setSavedFlash] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -169,27 +171,39 @@ export default function Home() {
   const loadedEntry = entries.find((e) => e.id === loadedId) ?? null;
 
   // ---- navigation ----
-  const goScan = () => {
-    setFlow("scan");
-    setError(null);
-    setScreen("scan");
-  };
   const goLibrary = () => {
     setScreen("library");
   };
   const goHome = () => setScreen("home");
 
+  /** "New dictation": fresh empty word list, ready to fill three ways. */
+  const startFresh = () => {
+    if (items.length > 0 && !window.confirm("Start a brand-new empty word list? Unsaved words will be gone! 🗑️")) return;
+    setItems([]);
+    setStaged(null);
+    setError(null);
+    setLoadedId(null);
+    setAppendMode(false);
+    setFlow("scan");
+    setScreen("review");
+  };
+
   // ---- Step: photo ----
-  const handleFile = (file: File) => {
+  const handleFile = (file: File, append = false) => {
     setStaged((prev) => {
       if (prev) URL.revokeObjectURL(prev.url);
       return { file, url: URL.createObjectURL(file) };
     });
-    setItems([]);
+    if (!append) setItems([]);
+    setAppendMode(append);
     setError(null);
     setLoadedId(null);
     setScreen("areas");
   };
+
+  /** ✏️ Manual add: blank row at the end — tap it to type. */
+  const handleManualAdd = () =>
+    setItems((prev) => [...prev, { id: prev.length + 1, text: "" }]);
 
   // ---- Step: areas -> OCR ----
   const handleCropConfirm = async (regions: CropRegion[] | null, mode: OcrMode) => {
@@ -216,7 +230,13 @@ export default function Home() {
         }
         result = texts.map((text, i) => ({ id: i + 1, text }));
       }
-      setItems(result);
+      // Fresh scan replaces the list; photo-add appends to it.
+      setItems((prev) => {
+        if (!appendMode) return result;
+        const base = prev.length;
+        return [...prev, ...result.map((it, i) => ({ ...it, id: base + i + 1 }))];
+      });
+      setAppendMode(false);
       if (result.length === 0) setError("No words found — try a clearer photo! 📷");
       setScreen("review");
     } catch (e) {
@@ -336,10 +356,10 @@ export default function Home() {
           <p className="mt-1 text-lg text-slate-500">Let&apos;s practise! 🎉</p>
           <div className="mt-6 flex flex-col gap-3">
             <button
-              onClick={goScan}
+              onClick={startFresh}
               className="btn-kid rounded-3xl bg-green-500 px-4 py-5 text-2xl font-black text-white shadow-lg hover:bg-green-600"
             >
-              📷 New dictation
+              📝 New dictation
             </button>
             <button
               onClick={goLibrary}
@@ -368,8 +388,8 @@ export default function Home() {
 
       {screen === "scan" && (
         <>
-          <CaptureStep onFile={handleFile} />
-          <BackButton onClick={goHome} label="← Home" />
+          <CaptureStep onFile={(f) => handleFile(f)} appendCount={appendMode ? items.length : 0} />
+          <BackButton onClick={appendMode ? () => setScreen("review") : goHome} label={appendMode ? "← Back to words" : "← Home"} />
         </>
       )}
 
@@ -410,13 +430,23 @@ export default function Home() {
               </button>
             </div>
           )}
-          {!loading && <BackButton onClick={() => setScreen("scan")} label="← Retake photo" />}
+          {!loading && (
+            <BackButton
+              onClick={() => setScreen(appendMode ? "review" : "scan")}
+              label={appendMode ? "← Back to words" : "← Retake photo"}
+            />
+          )}
         </>
       )}
 
       {screen === "review" && (
         <>
           <ReviewStep items={items} setItems={setItems} />
+          <AddWords
+            count={items.length}
+            onManual={handleManualAdd}
+            onPhotoFile={(f) => handleFile(f, true)}
+          />
           <SharePanel items={items} settings={settings} />
           {savedFlash && (
             <p className="rounded-2xl bg-green-100 p-3 text-center text-lg font-black text-green-700">
@@ -426,8 +456,10 @@ export default function Home() {
           <div className="flex flex-col gap-3">
             <div className="flex gap-2">
               <div className="flex-1">
+                {/* No staged photo (e.g. opened from a shared link) → back goes
+                    to the photo screen, never a blank areas screen. */}
                 <BackButton
-                  onClick={() => setScreen(flow === "scan" ? "areas" : "library")}
+                  onClick={() => setScreen(flow === "scan" ? (staged ? "areas" : "scan") : "library")}
                 />
               </div>
               <button
@@ -525,13 +557,10 @@ export default function Home() {
               </button>
               <div className="flex gap-2">
                 <button
-                  onClick={() => {
-                    setStaged(null);
-                    goScan();
-                  }}
+                  onClick={startFresh}
                   className="btn-kid flex-1 rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-600 hover:bg-slate-50"
                 >
-                  📷 New
+                  📝 New
                 </button>
                 <button
                   onClick={goLibrary}

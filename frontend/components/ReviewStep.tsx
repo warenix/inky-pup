@@ -19,9 +19,6 @@ export default function ReviewStep({ items, setItems }: Props) {
     setItems(rest.map((it, i) => ({ ...it, id: i + 1 })));
   };
 
-  const add = () =>
-    setItems([...items, { id: items.length + 1, text: "" }]);
-
   const openEditor = (id: number) => {
     const found = items.find((it) => it.id === id);
     if (!found) return;
@@ -98,14 +95,8 @@ export default function ReviewStep({ items, setItems }: Props) {
         ))}
       </ul>
       {items.length === 0 && (
-        <p className="mt-4 text-center text-slate-400">No words yet — go back and scan! 📷</p>
+        <p className="mt-4 text-center text-slate-400">No words yet — add your first one below! 👇</p>
       )}
-      <button
-        onClick={add}
-        className="btn-kid mt-4 w-full rounded-2xl border-4 border-dashed border-purple-300 px-4 py-3 text-lg font-black text-purple-500 hover:bg-purple-50"
-      >
-        ➕ Add a missing word
-      </button>
 
       {editingId !== null && (
         <div

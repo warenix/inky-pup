@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 
-export default function CaptureStep({ onFile }: { onFile: (f: File) => void }) {
+export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: File) => void; appendCount?: number }) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -25,6 +25,11 @@ export default function CaptureStep({ onFile }: { onFile: (f: File) => void }) {
       <p className="mt-1 text-center text-slate-500">
         Snap your dictation sheet. Lay it flat — ask a grown-up to help! 🙏
       </p>
+      {appendCount > 0 && (
+        <p className="mx-auto mt-2 w-fit rounded-full bg-green-100 px-4 py-1 text-center font-black text-green-700">
+          ✅ New words will join your {appendCount} words!
+        </p>
+      )}
 
       <div
         onDragOver={(e) => {
