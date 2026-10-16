@@ -41,19 +41,27 @@ const LIB_STEPS: Step[] = [
 ];
 
 /** Self-marking: tap each answer ✓ / ✗ after practising alone. */
-function AnswerCheck({ items, hidden }: { items: DictationItem[]; hidden: boolean }) {
+function AnswerCheck({
+  items,
+  hidden,
+  onWrongChange,
+}: {
+  items: DictationItem[];
+  hidden: boolean;
+  onWrongChange?: (wrong: DictationItem[]) => void;
+}) {
   const [marks, setMarks] = useState<Record<number, boolean>>({});
   if (items.length === 0) return null;
   const marked = Object.keys(marks).length;
   const correct = Object.values(marks).filter(Boolean).length;
-  const toggle = (id: number) =>
-    setMarks((m) => {
-      const next = { ...m };
-      if (!(id in next)) next[id] = true;
-      else if (next[id]) next[id] = false;
-      else delete next[id];
-      return next;
-    });
+  const toggle = (id: number) => {
+    const next = { ...marks };
+    if (!(id in next)) next[id] = true;
+    else if (next[id]) next[id] = false;
+    else delete next[id];
+    setMarks(next);
+    onWrongChange?.(items.filter((it) => next[it.id] === false));
+  };
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="text-center text-2xl font-black">
@@ -138,6 +146,7 @@ export default function Home() {
   const [entries, setEntries] = useState<DictationEntry[]>([]);
   const [loadedId, setLoadedId] = useState<string | null>(null);
   const [appendMode, setAppendMode] = useState(false);
+  const [wrongItems, setWrongItems] = useState<DictationItem[]>([]);
   const [playKey, setPlayKey] = useState(0);
   const [savedFlash, setSavedFlash] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -169,6 +178,11 @@ export default function Home() {
   };
 
   const loadedEntry = entries.find((e) => e.id === loadedId) ?? null;
+
+  // Missed-word marks belong to the current list — clear them on any change.
+  useEffect(() => {
+    setWrongItems([]);
+  }, [items]);
 
   // ---- navigation ----
   const goLibrary = () => {
@@ -319,8 +333,7 @@ export default function Home() {
     }
   };
 
-  /** Shared link / file arrived via ReceivePanel — jump to review. */
-  const handleImportShared = (sharedItems: DictationItem[], sharedSettings: TeacherSettings) => {
+  /** Shared link / file arrived via ReceivePanel — jump to review. */  const handleImportShared = (sharedItems: DictationItem[], sharedSettings: TeacherSettings) => {
     setItems(sharedItems);
     setSettings(sharedSettings);
     setLoadedId(null);
@@ -336,6 +349,14 @@ export default function Home() {
     } catch {
       setError("Couldn't rename — try again! 😢");
     }
+  };
+
+  /** Retry round: dictate just the ❌-marked words, renumbered. Repeatable until all ✅. */
+  const handleRetryWrong = () => {
+    if (wrongItems.length === 0) return;
+    setItems(wrongItems.map((it, i) => ({ ...it, id: i + 1 })));
+    setPlayKey((k) => k + 1);
+    setScreen("play");
   };
 
   // ---- stepper ----
@@ -537,9 +558,18 @@ export default function Home() {
             key={`answers-${playKey}`}
             items={items}
             hidden={settings.hideWords !== false}
+            onWrongChange={setWrongItems}
           />
           <section className="rounded-3xl bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-3">
+              {wrongItems.length > 0 && (
+                <button
+                  onClick={handleRetryWrong}
+                  className="btn-kid rounded-2xl bg-amber-500 px-4 py-4 text-xl font-black text-white shadow-lg hover:bg-amber-600"
+                >
+                  💪 Practise my {wrongItems.length} missed word{wrongItems.length > 1 ? "s" : ""}!
+                </button>
+              )}
               <button
                 onClick={() => {
                   setPlayKey((k) => k + 1);
