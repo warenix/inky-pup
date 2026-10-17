@@ -255,6 +255,16 @@ const en = {
   "notFound.title": "Page not found",
   "notFound.body": "That page wandered off!",
   "notFound.home": "🏠 Home",
+  /* ---- camera ---- */
+  "camera.title": "Take a photo",
+  "camera.starting": "Starting the camera…",
+  "camera.shutter": "Take the photo",
+  "camera.switch": "Switch camera",
+  "camera.cancel": "Cancel",
+  "camera.denied": "Camera access was blocked.",
+  "camera.missing": "No camera was found.",
+  "camera.unsupported": "This browser can't use the camera.",
+  "camera.fallbackHint": "Choose a picture from your computer instead.",
 } as const;
 
 export type TKey = keyof typeof en;
@@ -493,6 +503,16 @@ const zhHant: Dictionary = {
   "notFound.title": "找不到這個頁面",
   "notFound.body": "這個頁面走丟了！",
   "notFound.home": "🏠 首頁",
+  /* ---- camera ---- */
+  "camera.title": "影一張相",
+  "camera.starting": "正在開啟相機…",
+  "camera.shutter": "拍下照片",
+  "camera.switch": "切換鏡頭",
+  "camera.cancel": "取消",
+  "camera.denied": "未能使用相機。",
+  "camera.missing": "找不到相機。",
+  "camera.unsupported": "這個瀏覽器無法使用相機。",
+  "camera.fallbackHint": "可以改為從電腦選擇圖片。",
 };
 
 const DICTIONARIES: Record<Locale, Dictionary> = {

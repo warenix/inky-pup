@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import CameraCapture, { hasNativeCamera } from "./CameraCapture";
 import { useT } from "./LocaleProvider";
 
 export default function CaptureStep({
@@ -14,7 +15,21 @@ export default function CaptureStep({
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [webcam, setWebcam] = useState(false);
   const t = useT();
+
+  // Phones hand off to the system camera; desktop needs the webcam dialog.
+  const takePhoto = () => {
+    if (hasNativeCamera()) {
+      cameraRef.current?.click();
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      fileRef.current?.click();
+      return;
+    }
+    setWebcam(true);
+  };
 
   const handleFile = (f: File | undefined) => {
     if (!f) return;
@@ -74,7 +89,7 @@ export default function CaptureStep({
         ) : null}
         <div className="mt-4 flex w-full flex-col gap-3">
           <button
-            onClick={() => cameraRef.current?.click()}
+            onClick={takePhoto}
             className="btn-action bg-blue-500 text-white hover:bg-blue-600"
           >
             {t("capture.takePhoto")}
@@ -104,6 +119,20 @@ export default function CaptureStep({
           onChange={clear}
         />
       </div>
+
+      {webcam && (
+        <CameraCapture
+          onCapture={(file) => {
+            setWebcam(false);
+            handleFile(file);
+          }}
+          onCancel={() => setWebcam(false)}
+          onUnavailable={() => {
+            setWebcam(false);
+            fileRef.current?.click();
+          }}
+        />
+      )}
     </section>
   );
 }
