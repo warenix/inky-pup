@@ -68,3 +68,7 @@ with the sheet, and keep text level.
 `ReviewStep` editable list → `SettingsPanel` (lang `en-US`/`en-GB`/`yue-HK`/`zh-CN`,
 rate, repeats, pause, writing time) → `PlayerEngine` (Web Speech API loop:
 speak × N → writing countdown → next, with play/pause/restart/finish).
+
+---
+
+&hearts; Luna and Isla.
