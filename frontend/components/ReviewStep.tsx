@@ -49,51 +49,90 @@ export default function ReviewStep({ items, setItems }: Props) {
     setItems(next.map((it, k) => ({ ...it, id: k + 1 })));
   };
 
+  /**
+   * Join row i and row i+1 back into one word. OCR sometimes cuts a single
+   * word across two boxes (請 + 教 should be 請教); this puts it back together.
+   */
+  const merge = (i: number) => {
+    const j = i + 1;
+    if (i < 0 || j >= items.length) return;
+    const a = items[i].text;
+    const b = items[j].text;
+    // Glue straight back together: the OCR cut the word itself, so adding a
+    // space would leave "clim b" instead of "climb".
+    const merged = `${a}${b}`.replace(/\s*\n\s*/g, " ").trim();
+    const next = [...items];
+    next[i] = { ...next[i], text: merged };
+    next.splice(j, 1);
+    setItems(next.map((it, k) => ({ ...it, id: k + 1 })));
+  };
+
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="text-center text-2xl font-black">{t("review.title")}</h2>
       <p className="mt-1 text-center text-slate-500">{t("review.subtitle")}</p>
-      <ul className="mt-4 space-y-3">
-        {items.map((it) => (
-          <li key={it.id} className="flex items-center gap-2">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-200 text-lg font-black text-purple-700">
-              {it.id}
-            </span>
-            <button
-              onClick={() => openEditor(it.id)}
-              aria-label={t("review.editWord", { n: it.id })}
-              className="min-w-0 flex-1 truncate rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-lg font-bold hover:border-purple-300"
-            >
-              {it.text || <span className="text-slate-300">{t("review.placeholder")}</span>}
-            </button>
-            <div className="flex shrink-0 flex-col gap-1">
+      <ul className="mt-4 space-y-1">
+        {items.map((it, i) => (
+          <li key={it.id}>
+            <div className="flex items-center gap-2">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-200 text-lg font-black text-purple-700">
+                {it.id}
+              </span>
               <button
-                onClick={() => move(it.id, -1)}
-                disabled={it.id === 1}
-                aria-label={t("review.moveUp", { n: it.id })}
-                className="flex h-7 w-12 items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-600 hover:bg-slate-200 disabled:opacity-30"
+                onClick={() => openEditor(it.id)}
+                aria-label={t("review.editWord", { n: it.id })}
+                className="min-w-0 flex-1 truncate rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-lg font-bold hover:border-purple-300"
               >
-                ▲
+                {it.text || <span className="text-slate-300">{t("review.placeholder")}</span>}
               </button>
+              <div className="flex shrink-0 flex-col gap-1">
+                <button
+                  onClick={() => move(it.id, -1)}
+                  disabled={it.id === 1}
+                  aria-label={t("review.moveUp", { n: it.id })}
+                  className="flex h-7 w-12 items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-600 hover:bg-slate-200 disabled:opacity-30"
+                >
+                  ▲
+                </button>
+                <button
+                  onClick={() => move(it.id, 1)}
+                  disabled={it.id === items.length}
+                  aria-label={t("review.moveDown", { n: it.id })}
+                  className="flex h-7 w-12 items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-600 hover:bg-slate-200 disabled:opacity-30"
+                >
+                  ▼
+                </button>
+              </div>
               <button
-                onClick={() => move(it.id, 1)}
-                disabled={it.id === items.length}
-                aria-label={t("review.moveDown", { n: it.id })}
-                className="flex h-7 w-12 items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-600 hover:bg-slate-200 disabled:opacity-30"
+                onClick={() => remove(it.id)}
+                aria-label={t("review.deleteWord", { n: it.id })}
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-xl text-red-500 hover:bg-red-200"
               >
-                ▼
+                ✕
               </button>
             </div>
-            <button
-              onClick={() => remove(it.id)}
-              aria-label={t("review.deleteWord", { n: it.id })}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-xl text-red-500 hover:bg-red-200"
-            >
-              ✕
-            </button>
+
+            {/* OCR sometimes splits one word across two rows — tap + to join. */}
+            {i < items.length - 1 && (
+              <div className="flex items-center justify-center gap-2 py-1">
+                <span className="h-px w-8 bg-slate-200" />
+                <button
+                  onClick={() => merge(i)}
+                  aria-label={t("review.mergeLabel", { a: it.id, b: items[i + 1].id })}
+                  title={t("review.mergeHint")}
+                  className="btn-kid flex h-9 w-9 items-center justify-center rounded-full border-2 border-slate-200 bg-white text-xl font-black leading-none text-slate-400 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600"
+                >
+                  +
+                </button>
+                <span className="h-px w-8 bg-slate-200" />
+              </div>
+            )}
           </li>
         ))}
       </ul>
+      {items.length > 1 && (
+        <p className="mt-1 text-center text-sm text-slate-400">{t("review.mergeHint")}</p>
+      )}
       {items.length === 0 && (
         <p className="mt-4 text-center text-slate-400">{t("review.empty")}</p>
       )}

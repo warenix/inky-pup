@@ -99,6 +99,8 @@ const en = {
   "review.dialogLabel": "Word {n}",
   "review.wordLabel": "Word {n} text",
   "review.modalTitle": "✏️ Word {n}",
+  "review.mergeLabel": "Merge word {a} with word {b}",
+  "review.mergeHint": "OCR split a word? Tap + between the rows to join them.",
 
   /* ---- add words ---- */
   "add.title": "➕ Add more words!",
@@ -347,6 +349,8 @@ const zhHant: Dictionary = {
   "review.dialogLabel": "第 {n} 個字",
   "review.wordLabel": "第 {n} 個字的內容",
   "review.modalTitle": "✏️ 第 {n} 個字",
+  "review.mergeLabel": "合併第 {a} 和第 {b} 個字",
+  "review.mergeHint": "如果一個字被分開了，點一下兩行之間的 + 即可合併。",
 
   /* ---- add words ---- */
   "add.title": "➕ 加入更多生字",
