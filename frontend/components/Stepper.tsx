@@ -1,5 +1,7 @@
 "use client";
 
+import { useT } from "./LocaleProvider";
+
 export interface Step {
   icon: string;
   label: string;
@@ -7,8 +9,9 @@ export interface Step {
 
 /** Star stepper showing kids where they are in the adventure. */
 export default function Stepper({ steps, current }: { steps: Step[]; current: number }) {
+  const t = useT();
   return (
-    <nav aria-label="Progress" className="rounded-2xl bg-white/80 p-3 shadow-sm">
+    <nav aria-label={t("step.progress")} className="rounded-2xl bg-white/80 p-3 shadow-sm">
       <ol className="flex items-center justify-center gap-1 sm:gap-2">
         {steps.map((s, i) => {
           const done = i < current;

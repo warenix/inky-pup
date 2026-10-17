@@ -1,20 +1,29 @@
 "use client";
-import { useRef, useState } from "react";
 
-export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: File) => void; appendCount?: number }) {
+import { useRef, useState } from "react";
+import { useT } from "./LocaleProvider";
+
+export default function CaptureStep({
+  onFile,
+  appendCount = 0,
+}: {
+  onFile: (f: File) => void;
+  appendCount?: number;
+}) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const t = useT();
 
   const handleFile = (f: File | undefined) => {
     if (!f) return;
     if (!f.type.startsWith("image/")) {
-      alert("That doesn't look like a picture. Please pick an image! ");
+      alert(t("capture.errNotImage"));
       return;
     }
     if (f.size > 25 * 1024 * 1024) {
-      alert("That picture is a bit too big — under 25 MB please! ");
+      alert(t("capture.errTooBig"));
       return;
     }
     setPreview((prev) => {
@@ -32,13 +41,11 @@ export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: F
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">📷 Take a photo!</h2>
-      <p className="mt-1 text-center text-slate-500">
-        Snap your dictation sheet. Lay it flat — ask a grown-up to help! 
-      </p>
+      <h2 className="text-center text-2xl font-black">{t("capture.title")}</h2>
+      <p className="mt-1 text-center text-slate-500">{t("capture.subtitle")}</p>
       {appendCount > 0 && (
         <p className="mx-auto mt-2 w-fit rounded-full bg-green-100 px-4 py-1 text-center font-black text-green-700">
-           New words will join your {appendCount} words!
+          {t("capture.appendBadge", { n: appendCount })}
         </p>
       )}
 
@@ -59,20 +66,24 @@ export default function CaptureStep({ onFile, appendCount = 0 }: { onFile: (f: F
       >
         {preview ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="Dictation sheet preview" className="max-h-64 rounded-2xl object-contain" />
+          <img
+            src={preview}
+            alt={t("capture.previewAlt")}
+            className="max-h-64 rounded-2xl object-contain"
+          />
         ) : null}
         <div className="mt-4 flex w-full flex-col gap-3">
           <button
             onClick={() => cameraRef.current?.click()}
             className="btn-action bg-blue-500 text-white hover:bg-blue-600"
           >
-            📷 Take photo
+            {t("capture.takePhoto")}
           </button>
           <button
             onClick={() => fileRef.current?.click()}
             className="btn-action-md border-4 border-blue-400 bg-white text-blue-500 hover:bg-blue-50"
           >
-            🖼️ Choose picture
+            {t("capture.choosePicture")}
           </button>
         </div>
         {/* Camera-first picker (mobile opens the camera directly) */}

@@ -22,24 +22,27 @@ import { clearShareFromLocation, parseShareFromLocation } from "../lib/share";
 import { estimateSeconds, formatEstimate } from "../lib/estimate";
 import { DEFAULT_SETTINGS, type DictationItem, type TeacherSettings } from "../lib/types";
 import { speechSupported } from "../lib/speech";
+import type { TKey, Vars } from "../lib/i18n";
 import SpeechWarning from "../components/SpeechWarning";
+import LanguageSwitch from "../components/LanguageSwitch";
+import { useI18n, useT } from "../components/LocaleProvider";
 
 type Screen = "home" | "library" | "scan" | "areas" | "review" | "ready" | "play" | "done";
 type Flow = "scan" | "library";
 
 const SCAN_STEPS: Step[] = [
-  { icon: "", label: "Photo" },
-  { icon: "", label: "Areas" },
-  { icon: "", label: "Words" },
-  { icon: "", label: "Ready" },
-  { icon: "", label: "Play" },
+  { icon: "", label: "step.photo" },
+  { icon: "", label: "step.areas" },
+  { icon: "", label: "step.words" },
+  { icon: "", label: "step.ready" },
+  { icon: "", label: "step.play" },
 ];
 
 const LIB_STEPS: Step[] = [
-  { icon: "", label: "Library" },
-  { icon: "", label: "Words" },
-  { icon: "", label: "Ready" },
-  { icon: "", label: "Play" },
+  { icon: "", label: "step.library" },
+  { icon: "", label: "step.words" },
+  { icon: "", label: "step.ready" },
+  { icon: "", label: "step.play" },
 ];
 
 /** Self-marking: tap each answer ✓ / ✗ after practising alone. */
@@ -47,10 +50,12 @@ function AnswerCheck({
   items,
   hidden,
   onWrongChange,
+  t,
 }: {
   items: DictationItem[];
   hidden: boolean;
   onWrongChange?: (wrong: DictationItem[]) => void;
+  t: (key: TKey, vars?: Vars) => string;
 }) {
   const [marks, setMarks] = useState<Record<number, boolean>>({});
   if (items.length === 0) return null;
@@ -67,10 +72,10 @@ function AnswerCheck({
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="text-center text-2xl font-black">
-        {hidden ? "Answers — mark your work!" : "What you practised"}
+        {t(hidden ? "answer.titleHidden" : "answer.titleShown")}
       </h2>
       {hidden && (
-        <p className="mt-1 text-center text-slate-500">Tap each one: got it / missed.</p>
+        <p className="mt-1 text-center text-slate-500">{t("answer.hint")}</p>
       )}
       {marked > 0 && (
         <p className="mt-2 text-center text-xl font-black text-amber-600">
@@ -99,7 +104,15 @@ function AnswerCheck({
                 </span>
                 <span className="min-w-0 flex-1 truncate text-lg font-bold">{it.text}</span>
                 {hidden && (
-                  <span className="text-base font-bold">{mark === true ? "Got it" : mark === false ? "Missed" : "—"}</span>
+                  <span className="text-base font-bold">
+                    {t(
+                      mark === true
+                        ? "answer.got"
+                        : mark === false
+                          ? "answer.missed"
+                          : "answer.unmarked"
+                    )}
+                  </span>
                 )}
               </button>
             </li>
@@ -110,33 +123,50 @@ function AnswerCheck({
   );
 }
 
-function BackButton({ onClick, label = "← Back" }: { onClick: () => void; label?: string }) {
+function BackButton({
+  onClick,
+  label,
+  t,
+}: {
+  onClick: () => void;
+  label?: string;
+  t: (key: TKey, vars?: Vars) => string;
+}) {
   return (
     <button
       onClick={onClick}
       className="btn-back"
     >
-      {label}
+      {label ?? t("common.back")}
     </button>
   );
 }
 
 /** "How long will this take?" — updates live as choices change. */
-function EstimateCard({ items, settings }: { items: DictationItem[]; settings: TeacherSettings }) {
+function EstimateCard({
+  items,
+  settings,
+  t,
+}: {
+  items: DictationItem[];
+  settings: TeacherSettings;
+  t: (key: TKey, vars?: Vars) => string;
+}) {
   if (items.length === 0) return null;
-  const { big, small } = formatEstimate(estimateSeconds(items, settings));
+  const { big, small } = formatEstimate(estimateSeconds(items, settings), t);
   return (
     <section className="rounded-3xl border-4 border-amber-300 bg-amber-100 p-6 text-center shadow-sm">
       <p className="text-5xl">⏱️</p>
       <p className="mt-1 text-2xl font-black text-amber-800">{big}</p>
       <p className="text-sm text-amber-700">
-        {small} · {items.length} words
+        {small} · {t("estimate.words", { n: items.length })}
       </p>
     </section>
   );
 }
 
 export default function Home() {
+  const { t, locale } = useI18n();
   const [screen, setScreen] = useState<Screen>("home");
   const [flow, setFlow] = useState<Flow>("scan");
   const [items, setItems] = useState<DictationItem[]>([]);
@@ -200,8 +230,8 @@ export default function Home() {
   const canPractise = hasList && blankRows.length === 0;
   const blankWarning =
     blankRows.length === 1
-      ? `Word ${blankRows[0].id} is still empty — type it or press ✕ to delete it.`
-      : `${blankRows.length} words are still empty — type them or press ✕ to delete them.`;
+      ? t("msg.blankOne", { n: blankRows[0].id })
+      : t("msg.blankMany", { n: blankRows.length });
 
   // ---- navigation ----
   const goLibrary = () => {
@@ -212,7 +242,7 @@ export default function Home() {
   /** Words -> Ready. Refuses to advance while any row is empty. */
   const goReady = () => {
     if (!hasList) {
-      setError("Add some words before you start! ");
+      setError(t("msg.addWordsFirst"));
       return;
     }
     if (blankRows.length > 0) {
@@ -226,7 +256,7 @@ export default function Home() {
   /** Ready -> Play. Final gate so a blank list can never reach the voice. */
   const goPlay = () => {
     if (!canPractise) {
-      setError(hasList ? blankWarning : "Add some words before you start! ");
+      setError(hasList ? blankWarning : t("msg.addWordsFirst"));
       setScreen("review");
       return;
     }
@@ -237,7 +267,7 @@ export default function Home() {
 
   /** "New dictation": fresh empty word list, ready to fill three ways. */
   const startFresh = () => {
-    if (items.length > 0 && !window.confirm("Start a brand-new empty word list? Unsaved words will be gone! ️")) return;
+    if (items.length > 0 && !window.confirm(t("msg.startFreshConfirm"))) return;
     setItems([]);
     setStaged((prev) => {
       if (prev) URL.revokeObjectURL(prev.url);
@@ -299,10 +329,10 @@ export default function Home() {
         return [...prev, ...result.map((it, i) => ({ ...it, id: base + i + 1 }))];
       });
       setAppendMode(false);
-      if (result.length === 0) setError("No words found — try a clearer photo! ");
+      if (result.length === 0) setError(t("scan.noWordsFound"));
       setScreen("review");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Reading failed");
+      setError(e instanceof Error ? e.message : t("msg.readingFailed"));
     } finally {
       setLoading(false);
     }
@@ -321,7 +351,7 @@ export default function Home() {
 
   // ---- library ----
   const autoName = () =>
-    `${new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" })} · ${items.length} words`;
+    `${new Date().toLocaleDateString(locale, { month: "short", day: "numeric" })} · ${t("estimate.words", { n: items.length })}`;
 
   /** Write the current voice settings back to the loaded dictation (no-op if none). */
   const persistVoice = async () => {
@@ -355,7 +385,7 @@ export default function Home() {
       setSavedFlash(true);
       setTimeout(() => setSavedFlash(false), 2500);
     } catch {
-      setError("Couldn't save — this browser blocks saving. ");
+      setError(t("msg.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -373,13 +403,19 @@ export default function Home() {
 
   const handleDeleteEntry = async (id: string) => {
     const entry = entries.find((e) => e.id === id);
-    if (!window.confirm(`Delete ${entry?.name ?? "this dictation"}? This can't be undone.`)) return;
+    const label = entry?.name;
+    if (
+      !window.confirm(
+        label ? t("msg.deleteConfirm", { name: label }) : t("msg.deleteConfirmUnknown")
+      )
+    )
+      return;
     try {
       await deleteEntry(id);
       if (loadedId === id) setLoadedId(null);
       await refreshEntries();
     } catch {
-      setError("Couldn't delete — try again! ");
+      setError(t("msg.deleteFailed"));
     }
   };
 
@@ -397,7 +433,7 @@ export default function Home() {
       await renameEntry(id, name);
       await refreshEntries();
     } catch {
-      setError("Couldn't rename — try again! ");
+      setError(t("msg.renameFailed"));
     }
   };
 
@@ -410,7 +446,10 @@ export default function Home() {
   };
 
   // ---- stepper ----
-  const steps = flow === "scan" ? SCAN_STEPS : LIB_STEPS;
+  const steps = (flow === "scan" ? SCAN_STEPS : LIB_STEPS).map((s) => ({
+    icon: s.icon,
+    label: t(s.label as TKey),
+  }));
   const stepIndex: Record<string, number> = flow === "scan"
     ? { scan: 0, areas: 1, review: 2, ready: 3, play: 4 }
     : { library: 0, review: 1, ready: 2, play: 3 };
@@ -423,27 +462,35 @@ export default function Home() {
       {screen === "home" && (
         <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/mascot.svg" alt="Inky Pup mascot" className="mx-auto h-28 w-28 transition hover:scale-110" />
-          <h1 className="mt-2 text-3xl font-black">Inky Pup Dictation 🐾</h1>
-          <p className="mt-1 text-lg text-slate-500">Let&apos;s practise!</p>
+          <img src="/mascot.svg" alt={t("common.mascotAlt")} className="mx-auto h-28 w-28 transition hover:scale-110" />
+          <h1 className="mt-2 text-3xl font-black">{t("home.title")}</h1>
+          <p className="mt-1 text-lg text-slate-500">{t("home.subtitle")}</p>
           <div className="mt-6 flex flex-col gap-3">
             <button
               onClick={startFresh}
               className="btn-action bg-green-500 text-white hover:bg-green-600"
             >
-              📝 New dictation
+              {t("home.new")}
             </button>
             <button
               onClick={goLibrary}
               className="btn-action bg-purple-500 text-white hover:bg-purple-600"
             >
-              📚 My dictations{entries.length > 0 ? ` (${entries.length})` : ""}
+              {t("home.myDictations")}
+              {entries.length > 0 ? ` (${entries.length})` : ""}
             </button>
           </div>
-          <p className="mt-6 text-sm text-slate-400">Everything stays on this device — no internet needed!</p>
+          <p className="mt-6 text-sm text-slate-400">{t("home.privacy")}</p>
         </section>
       )}
-      {screen === "home" && <ReceivePanel onImport={handleImportShared} />}
+      {screen === "home" && (
+        <>
+          <ReceivePanel onImport={handleImportShared} />
+          <div className="flex justify-center">
+            <LanguageSwitch />
+          </div>
+        </>
+      )}
 
       {screen === "library" && (
         <>
@@ -454,14 +501,17 @@ export default function Home() {
             onDelete={handleDeleteEntry}
             onRename={handleRenameEntry}
           />
-          <BackButton onClick={goHome} label="← Home" />
+          <BackButton t={t}
+                onClick={goHome} label={t("common.home")} />
         </>
       )}
 
       {screen === "scan" && (
         <>
           <CaptureStep onFile={(f) => handleFile(f)} appendCount={appendMode ? items.length : 0} />
-          <BackButton onClick={appendMode ? () => setScreen("review") : goHome} label={appendMode ? "← Back to words" : "← Home"} />
+          <BackButton t={t}
+                onClick={appendMode ? () => setScreen("review") : goHome}
+              label={appendMode ? t("capture.backRetake") : t("common.home")} />
         </>
       )}
 
@@ -470,8 +520,8 @@ export default function Home() {
           {loading ? (
             <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/mascot.svg" alt="Inky Pup" className="mx-auto h-24 w-24 animate-bounce" />
-              <h2 className="mt-2 text-2xl font-black">Reading your photo…</h2>
+              <img src="/mascot.svg" alt={t("common.mascotAlt")} className="mx-auto h-24 w-24 animate-bounce" />
+              <h2 className="mt-2 text-2xl font-black">{t("scan.reading")}</h2>
               <p className="mt-2 text-4xl font-black text-amber-500">
                 {progress ? `${Math.round(progress.progress * 100)}%` : "…"}
               </p>
@@ -481,7 +531,7 @@ export default function Home() {
                   style={{ width: `${Math.round((progress?.progress ?? 0) * 100)}%` }}
                 />
               </div>
-              <p className="mt-3 text-slate-500">Good things take a few seconds! ⏳</p>
+              <p className="mt-3 text-slate-500">{t("scan.wait")}</p>
             </section>
           ) : (
             <CropEditor
@@ -493,19 +543,20 @@ export default function Home() {
           )}
           {error && !loading && (
             <div className="rounded-3xl bg-red-50 p-6 text-center shadow-sm">
-              <p className="mt-2 text-xl font-black text-red-600">Oops! {error}</p>
+              <p className="mt-2 text-xl font-black text-red-600">{t("scan.oops", { message: error })}</p>
               <button
                 onClick={loadDemo}
                 className="btn-action-md mt-3 bg-white text-slate-600 hover:bg-slate-50"
               >
-                Try demo words instead
+                {t("scan.demo")}
               </button>
             </div>
           )}
           {!loading && (
             <BackButton
-              onClick={() => setScreen(appendMode ? "review" : "scan")}
-              label={appendMode ? "← Back to words" : "← Retake photo"}
+              t={t}
+                onClick={() => setScreen(appendMode ? "review" : "scan")}
+              label={appendMode ? t("capture.backRetake") : t("capture.backRetake")}
             />
           )}
         </>
@@ -522,7 +573,7 @@ export default function Home() {
           <SharePanel items={items} settings={settings} />
           {savedFlash && (
             <p className="rounded-2xl bg-green-100 p-3 text-center text-lg font-black text-green-700">
-              Saved! Find it in My dictations.
+              {t("msg.saved")}
             </p>
           )}
           {hasList && blankRows.length > 0 && (
@@ -544,19 +595,20 @@ export default function Home() {
               disabled={!hasList}
               className="btn-action bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
             >
-              Next!
+              {t("common.next")}
             </button>
             <button
               onClick={handleSaveEntry}
               disabled={items.length === 0 || saving}
               className="btn-action-md bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40"
             >
-              {saving ? "Saving…" : "Save"}
+              {saving ? t("common.saving") : t("common.save")}
             </button>
             {/* No staged photo (e.g. opened from a shared link) → back goes
                 to the photo screen, never a blank areas screen. */}
             <BackButton
-              onClick={() => setScreen(flow === "scan" ? (staged ? "areas" : "scan") : "library")}
+              t={t}
+                onClick={() => setScreen(flow === "scan" ? (staged ? "areas" : "scan") : "library")}
             />
           </div>
         </>
@@ -567,16 +619,16 @@ export default function Home() {
           <SpeechWarning onDismiss={() => {/* noop */}} />
           {loadedEntry && (
             <p className="rounded-2xl bg-white/80 p-2 text-center text-sm font-bold text-slate-500 shadow-sm">
-               Voice will be remembered for “{loadedEntry.name}”
+              {t("ready.voiceRemembered", { name: loadedEntry.name })}
             </p>
           )}
           <KidSettings settings={settings} setSettings={setSettings} />
-          <EstimateCard items={items} settings={settings} />
+          <EstimateCard items={items} settings={settings} t={t} />
           <div className="flex flex-col gap-3">
             <button
               onClick={() => {
                 if (!canPractise) {
-                  setError(hasList ? blankWarning : "Add some words before you start! ");
+                  setError(hasList ? blankWarning : t("msg.addWordsFirst"));
                   setScreen("review");
                   return;
                 }
@@ -588,19 +640,20 @@ export default function Home() {
               className="btn-action bg-green-500 text-white hover:bg-green-600"
               disabled={!speechSupported()}
             >
-              ▶ Start!
+              {t("ready.start")}
             </button>
             <BackButton
-              onClick={() => {
+              t={t}
+                onClick={() => {
                 void persistVoice();
                 setScreen("review");
               }}
-              label="← Check words"
+              label={t("ready.checkWords")}
             />
           </div>
           {!speechSupported() && (
             <p className="text-center text-sm text-amber-600">
-               Web Speech API not available — some dictation features will be limited
+               {t("ready.speechUnsupported")}
             </p>
           )}
         </>
@@ -626,11 +679,11 @@ export default function Home() {
             <span style={{ left: "88%", animationDelay: "0.6s" }}>🎉</span>
           </div>
           <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
-            <h1 className="mt-2 text-3xl font-black">🎉 Amazing work! 🎉</h1>
+            <h1 className="mt-2 text-3xl font-black">{t("done.title")}</h1>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mascot.svg" alt="Inky Pup" className="mx-auto mt-3 h-24 w-24 animate-bounce" />
+            <img src="/mascot.svg" alt={t("common.mascotAlt")} className="mx-auto mt-3 h-24 w-24 animate-bounce" />
             <p className="mt-1 text-lg text-slate-500">
-              You finished {items.length} words! So proud of you!
+              {t("done.subtitle", { n: items.length })}
             </p>
           </section>
           <AnswerCheck
@@ -638,6 +691,7 @@ export default function Home() {
             items={items}
             hidden={settings.hideWords !== false}
             onWrongChange={setWrongItems}
+            t={t}
           />
           <section className="rounded-3xl bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-3">
@@ -646,7 +700,7 @@ export default function Home() {
                   onClick={handleRetryWrong}
                   className="btn-action bg-amber-500 text-white hover:bg-amber-600"
                 >
-                  Practise missed words ({wrongItems.length})
+                  {t("done.practiseMissed", { n: wrongItems.length })}
                 </button>
               )}
               <button
@@ -656,15 +710,16 @@ export default function Home() {
                 }}
                 className="btn-action bg-green-500 text-white hover:bg-green-600"
               >
-                Practise again
+                {t("done.practiseAgain")}
               </button>
               <button
                 onClick={goLibrary}
                 className="btn-action-md w-full border-4 border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
               >
-                Library
+                {t("common.library")}
               </button>
-              <BackButton onClick={() => setScreen("review")} label="← Check words" />
+              <BackButton t={t}
+                onClick={() => setScreen("review")} label={t("done.checkWords")} />
             </div>
           </section>
         </>

@@ -6,6 +6,7 @@ import {
   buildShareUrl,
 } from "../lib/share";
 import type { DictationItem, TeacherSettings } from "../lib/types";
+import { useT } from "./LocaleProvider";
 
 interface Props {
   items: DictationItem[];
@@ -17,6 +18,7 @@ export default function SharePanel({ items, settings }: Props) {
   const [showQR, setShowQR] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   const { url, tooLong } = useMemo(() => {
     if (items.length === 0) return { url: "", tooLong: false };
@@ -47,7 +49,7 @@ export default function SharePanel({ items, settings }: Props) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       } catch {
-        setError("Couldn't copy — long-press the link below to copy it. ");
+        setError(t("share.copyError"));
       }
       ta.remove();
     }
@@ -75,7 +77,11 @@ export default function SharePanel({ items, settings }: Props) {
   const shareNative = async () => {
     if (typeof navigator === "undefined" || !("share" in navigator)) return false;
     try {
-      await navigator.share({ title: "My dictation", text: `${items.length} words to practise!`, url });
+      await navigator.share({
+        title: t("share.shareTitle"),
+        text: t("share.shareText", { n: items.length }),
+        url,
+      });
       return true;
     } catch {
       return false; // user cancelled or share failed — stay on panel
@@ -84,23 +90,21 @@ export default function SharePanel({ items, settings }: Props) {
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">📤 Share</h2>
-      <p className="mt-1 text-center text-slate-500">
-        Send to another device — no account, link holds the words!
-      </p>
+      <h2 className="text-center text-2xl font-black">{t("share.title")}</h2>
+      <p className="mt-1 text-center text-slate-500">{t("share.subtitle")}</p>
       <div className="mt-3 flex flex-col gap-2">
         <div className="flex gap-2">
           <button
             onClick={copyLink}
             className="btn-action-md flex-1 bg-purple-500 text-white hover:bg-purple-600"
           >
-            {copied ? "Copied!" : "Copy link"}
+            {copied ? t("share.copied") : t("share.copyLink")}
           </button>
           <button
             onClick={() => setShowQR((v) => !v)}
             className="btn-action-md flex-1 bg-amber-400 text-amber-900 hover:bg-amber-500"
           >
-            {showQR ? "Hide QR" : "Show QR"}
+            {showQR ? t("share.hideQR") : t("share.showQR")}
           </button>
         </div>
         {typeof navigator !== "undefined" && "share" in navigator && (
@@ -108,19 +112,19 @@ export default function SharePanel({ items, settings }: Props) {
             onClick={() => void shareNative()}
             className="btn-action-md w-full border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
           >
-            Send via chat…
+            {t("share.sendChat")}
           </button>
         )}
         <button
           onClick={downloadJson}
           className="btn-action-md w-full border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
         >
-          Download file (for long lists)
+          {t("share.download")}
         </button>
       </div>
       {tooLong && (
         <p className="mt-3 rounded-2xl bg-amber-100 p-3 text-center text-sm font-bold text-amber-800">
-          Long list — QR may be hard to scan. Copy link or file works better!
+          {t("share.tooLong")}
         </p>
       )}
       {error && <p className="mt-2 text-center font-bold text-red-500">{error}</p>}
@@ -130,7 +134,7 @@ export default function SharePanel({ items, settings }: Props) {
             <QRCodeSVG value={url} size={220} level={tooLong ? "L" : "M"} />
           </div>
           <p className="mt-2 text-sm text-slate-500">
-            Scan with the other phone&apos;s camera 
+            {t("share.qrHint")}
           </p>
           <p className="mt-1 break-all rounded-2xl bg-slate-100 p-2 text-xs text-slate-500">{url}</p>
         </div>

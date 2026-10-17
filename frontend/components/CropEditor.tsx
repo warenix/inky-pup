@@ -6,6 +6,7 @@ import {
   type CropRegion,
   type OcrMode,
 } from "../lib/ocr";
+import { useT } from "./LocaleProvider";
 
 interface Props {
   imageUrl: string;
@@ -22,6 +23,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
   const [draft, setDraft] = useState<CropRegion | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   const [mode, setMode] = useState<OcrMode>("lines");
+  const t = useT();
 
   const toRelative = (clientX: number, clientY: number) => {
     const rect = boxRef.current!.getBoundingClientRect();
@@ -69,10 +71,9 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">✏️ Circle the words!</h2>
+      <h2 className="text-center text-2xl font-black">{t("crop.title")}</h2>
       <p className="mt-1 text-center text-slate-500">
-        Draw {regions.length === 0 ? "a box" : "more boxes"} around the words with your finger! 
-        Leave a little space around the letters.
+        {regions.length === 0 ? t("crop.helpFirst") : t("crop.helpMore")}
       </p>
 
       <div className="mt-3 flex rounded-2xl bg-slate-100 p-1 text-base font-black">
@@ -82,7 +83,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
             mode === "lines" ? "bg-white shadow" : "text-slate-500"
           }`}
         >
-          Sentences
+          {t("crop.modeLines")}
         </button>
         <button
           onClick={() => setMode("words")}
@@ -90,13 +91,11 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
             mode === "words" ? "bg-white shadow" : "text-slate-500"
           }`}
         >
-          Words
+          {t("crop.modeWords")}
         </button>
       </div>
       <p className="mt-1 text-center text-sm text-slate-400">
-        {mode === "words"
-          ? "Pick this for word lists — one word at a time! "
-          : "Pick this for sentences — long lines! "}
+        {mode === "words" ? t("crop.hintWords") : t("crop.hintLines")}
       </p>
 
       <div
@@ -110,7 +109,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={imageUrl}
-          alt="Uploaded dictation sheet"
+          alt={t("capture.sheetAlt")}
           className="pointer-events-none block w-full"
           draggable={false}
         />
@@ -147,7 +146,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
                 <button
                   onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => remove(i, e)}
-                  aria-label={`Delete area ${n}`}
+                  aria-label={t("crop.deleteArea", { n })}
                   className="absolute -right-3 -top-3 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white shadow"
                 >
                   ✕
@@ -164,14 +163,18 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
           disabled={regions.length === 0 || scanning}
           className="btn-action bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
         >
-          Read {regions.length === 0 ? "my drawing!" : `${regions.length} box${regions.length > 1 ? "es" : ""}!`}
+          {regions.length === 0
+            ? t("crop.readDrawing")
+            : t(regions.length > 1 ? "crop.readBoxesPlural" : "crop.readBoxes", {
+                n: regions.length,
+              })}
         </button>
         <button
           onClick={() => onConfirm(null, mode)}
           disabled={scanning}
           className="btn-action-md border-4 border-slate-300 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40"
         >
-          Read the whole photo
+          {t("crop.readWhole")}
         </button>
         {regions.length > 0 && (
           <button
@@ -182,7 +185,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
             disabled={scanning}
             className="rounded-2xl px-3 py-2 text-base text-slate-500 hover:bg-slate-100 disabled:opacity-40"
           >
-            Start over
+            {t("crop.startOver")}
           </button>
         )}
       </div>

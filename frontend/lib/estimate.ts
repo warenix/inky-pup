@@ -1,4 +1,5 @@
 import { chunkSentence, estimateAudioSeconds, repeatPauseSeconds, singleChunk } from "./chunks";
+import type { TKey, Vars } from "./i18n";
 import { expandPunctuation } from "./speech";
 import type { DictationItem, TeacherSettings } from "./types";
 
@@ -33,13 +34,22 @@ export function estimateSeconds(
 }
 
 /** Kid-friendly "About 3 min", with an exact subtitle for grown-ups. */
-export function formatEstimate(totalSecs: number): { big: string; small: string } {
+export function formatEstimate(
+  totalSecs: number,
+  t: (key: TKey, vars?: Vars) => string
+): { big: string; small: string } {
   if (totalSecs < 60) {
     const s = Math.max(5, Math.round(totalSecs / 5) * 5);
-    return { big: `About ${s} seconds`, small: `≈ ${totalSecs} sec in total` };
+    return {
+      big: t("estimate.seconds", { n: s }),
+      small: t("estimate.exactSeconds", { n: totalSecs }),
+    };
   }
   const m = Math.floor(totalSecs / 60);
   const s = Math.round(totalSecs % 60);
-  const exact = s === 0 ? `${m} min` : `${m} min ${s} sec`;
-  return { big: `About ${m} min`, small: `≈ ${exact} in total` };
+  const exact =
+    s === 0
+      ? t("estimate.exactMinutes", { n: m })
+      : t("estimate.exactMinutesSeconds", { n: m, s });
+  return { big: t("estimate.minutes", { n: m }), small: exact };
 }

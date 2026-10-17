@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { DictationItem } from "../lib/types";
+import { useT } from "./LocaleProvider";
 
 interface Props {
   items: DictationItem[];
@@ -10,6 +11,7 @@ interface Props {
 export default function ReviewStep({ items, setItems }: Props) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
+  const t = useT();
 
   const update = (id: number, text: string) =>
     setItems(items.map((it) => (it.id === id ? { ...it, text } : it)));
@@ -49,10 +51,8 @@ export default function ReviewStep({ items, setItems }: Props) {
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">✅ Check the words!</h2>
-      <p className="mt-1 text-center text-slate-500">
-        Tap ▲ ▼ to move words around, fix typos here! 
-      </p>
+      <h2 className="text-center text-2xl font-black">{t("review.title")}</h2>
+      <p className="mt-1 text-center text-slate-500">{t("review.subtitle")}</p>
       <ul className="mt-4 space-y-3">
         {items.map((it) => (
           <li key={it.id} className="flex items-center gap-2">
@@ -61,16 +61,16 @@ export default function ReviewStep({ items, setItems }: Props) {
             </span>
             <button
               onClick={() => openEditor(it.id)}
-              aria-label={`Edit word ${it.id}`}
+              aria-label={t("review.editWord", { n: it.id })}
               className="min-w-0 flex-1 truncate rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-lg font-bold hover:border-purple-300"
             >
-              {it.text || <span className="text-slate-300">Tap to type… ✏️</span>}
+              {it.text || <span className="text-slate-300">{t("review.placeholder")}</span>}
             </button>
             <div className="flex shrink-0 flex-col gap-1">
               <button
                 onClick={() => move(it.id, -1)}
                 disabled={it.id === 1}
-                aria-label={`Move word ${it.id} up`}
+                aria-label={t("review.moveUp", { n: it.id })}
                 className="flex h-7 w-12 items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-600 hover:bg-slate-200 disabled:opacity-30"
               >
                 ▲
@@ -78,7 +78,7 @@ export default function ReviewStep({ items, setItems }: Props) {
               <button
                 onClick={() => move(it.id, 1)}
                 disabled={it.id === items.length}
-                aria-label={`Move word ${it.id} down`}
+                aria-label={t("review.moveDown", { n: it.id })}
                 className="flex h-7 w-12 items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-600 hover:bg-slate-200 disabled:opacity-30"
               >
                 ▼
@@ -86,7 +86,7 @@ export default function ReviewStep({ items, setItems }: Props) {
             </div>
             <button
               onClick={() => remove(it.id)}
-              aria-label={`Delete word ${it.id}`}
+              aria-label={t("review.deleteWord", { n: it.id })}
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-xl text-red-500 hover:bg-red-200"
             >
               ✕
@@ -95,7 +95,7 @@ export default function ReviewStep({ items, setItems }: Props) {
         ))}
       </ul>
       {items.length === 0 && (
-        <p className="mt-4 text-center text-slate-400">No words yet — add your first one below! </p>
+        <p className="mt-4 text-center text-slate-400">{t("review.empty")}</p>
       )}
 
       {editingId !== null && (
@@ -104,14 +104,14 @@ export default function ReviewStep({ items, setItems }: Props) {
           onClick={closeEditor}
           role="dialog"
           aria-modal="true"
-          aria-label={`Edit word ${editingId}`}
+          aria-label={t("review.dialogLabel", { n: editingId })}
         >
           <div
             className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-center text-2xl font-black">
-              ✏️ Word {editingId}
+              {t("review.modalTitle", { n: editingId })}
             </h3>
             <textarea
               value={draft}
@@ -121,7 +121,7 @@ export default function ReviewStep({ items, setItems }: Props) {
               onKeyDown={(e) => {
                 if (e.key === "Escape") closeEditor();
               }}
-              aria-label={`Word ${editingId} text`}
+              aria-label={t("review.wordLabel", { n: editingId })}
               className="mt-3 w-full rounded-2xl border-4 border-purple-300 px-4 py-3 text-xl font-bold focus:border-purple-500 focus:outline-none"
             />
             <div className="mt-3 flex gap-2">
@@ -129,13 +129,13 @@ export default function ReviewStep({ items, setItems }: Props) {
                 onClick={closeEditor}
                 className="btn-action-md flex-1 border-4 border-slate-300 bg-white text-slate-500 hover:bg-slate-50"
               >
-                ✕ Cancel
+                ✕ {t("common.cancel")}
               </button>
               <button
                 onClick={saveEditor}
                 className="btn-action-md flex-1 bg-green-500 text-white hover:bg-green-600"
               >
-                ✓ Done
+                ✓ {t("common.done")}
               </button>
             </div>
           </div>

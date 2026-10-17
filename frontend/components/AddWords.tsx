@@ -1,5 +1,7 @@
 "use client";
+
 import { useRef } from "react";
+import { useT } from "./LocaleProvider";
 
 interface Props {
   count: number;
@@ -11,6 +13,7 @@ interface Props {
 export default function AddWords({ count, onManual, onPhotoFile }: Props) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const t = useT();
 
   // Reset the input so picking the same file twice still fires onChange.
   const clear = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,29 +24,29 @@ export default function AddWords({ count, onManual, onPhotoFile }: Props) {
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">➕ Add more words!</h2>
+      <h2 className="text-center text-2xl font-black">{t("add.title")}</h2>
       <p className="mt-1 text-center text-slate-500">
-        {count === 0 ? "Start your list — pick one! " : "Keep growing your list! "}
+        {count === 0 ? t("add.subtitleEmpty") : t("add.subtitleMore")}
       </p>
       <div className="mt-4 flex flex-col gap-3">
         <button
           onClick={onManual}
           className="btn-action bg-purple-500 text-white hover:bg-purple-600"
         >
-          ✏️ Write it myself
+          {t("add.manual")}
         </button>
         <div className="flex gap-2">
           <button
             onClick={() => cameraRef.current?.click()}
             className="btn-action-md flex-1 bg-blue-500 text-white hover:bg-blue-600"
           >
-            📷 Photo
+            {t("add.photo")}
           </button>
           <button
             onClick={() => fileRef.current?.click()}
             className="btn-action-md flex-1 border-4 border-blue-400 bg-white text-blue-500 hover:bg-blue-50"
           >
-            🖼️ Upload
+            {t("add.upload")}
           </button>
         </div>
       </div>

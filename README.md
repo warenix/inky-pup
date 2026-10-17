@@ -1,9 +1,11 @@
-# Inky Pup Dictation
+# Inky Pup 黑犬聽寫
 
 Scan dictation sheets with OCR, review the words, configure a virtual teacher,
 and play back dictation with the browser's speech synthesis.
 
-**100% client-side — no server, no uploads.** OCR runs in the page via
+**黑犬聽寫** — 掃描、檢查、朗讀，一切在裝置內完成。
+
+100% client-side — no server, no uploads. OCR runs in the page via
 [Tesseract.js](https://github.com/naptha/tesseract.js) (WASM port of Tesseract)
 with Traditional Chinese (`chi_tra`) + English traineddata, LSTM engine, and
 PSM 6 tuned for printed word lists. Photos never leave the device.
