@@ -2,15 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------ *
+ * Design tokens — Nintendo Switch inspired
+ *
+ * Switch UI rests on a flat neutral canvas, white rounded panels lifted by
+ * soft shadows, one loud accent, and very obvious selected/focus states.
+ * ------------------------------------------------------------------ */
+:root {
+  /* Flat neutral canvas, like the Switch HOME menu */
+  --sw-canvas: #eef1f4;
+  --sw-canvas-deep: #dfe4ea;
+  --sw-card: #ffffff;
+  --sw-ink: #2b2d2e;
+  --sw-ink-soft: #5b6069;
+  /* One loud accent for primary actions */
+  --sw-accent: #e60012;
+  --sw-accent-hover: #c80010;
+  --sw-accent-soft: #ffe9eb;
+  /* Calm secondary for links and selection */
+  --sw-info: #007d8c;
+  --sw-info-soft: #e2f4f6;
+  /* Card elevation: two soft layers, never a hard edge */
+  --sw-shadow-sm: 0 1px 2px rgba(43, 45, 46, 0.08);
+  --sw-shadow: 0 2px 6px rgba(43, 45, 46, 0.1);
+  --sw-shadow-lg: 0 6px 18px rgba(43, 45, 46, 0.12);
+  /* Strong, unmistakable focus ring */
+  --sw-ring: 0 0 0 4px rgba(0, 125, 140, 0.45);
+  --sw-radius: 1.5rem;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  @apply text-slate-900;
-  background: linear-gradient(180deg, #e0f2fe 0%, #fef9c3 55%, #dcfce7 100%);
+  @apply text-[#2b2d2e];
+  background-color: var(--sw-canvas);
+  background-image: linear-gradient(180deg, #f4f6f8 0%, var(--sw-canvas) 40%, var(--sw-canvas-deep) 100%);
   background-attachment: fixed;
   min-height: 100vh;
   font-family:
     ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN",
     "Chalkboard SE", "Comic Sans MS", "Comic Neue", system-ui, sans-serif;
   font-size: 1.05rem;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Chunky kid-friendly press effect for big buttons */
@@ -19,35 +54,133 @@ body {
   min-height: 3.5rem;
 }
 
-/* ---- Shared action system (used on every screen) ----
-   One big primary action, medium secondary actions, small helpers,
-   and a single just-fit back button. Colours are added per action. */
-
-/* Primary: one per screen, the biggest thing on the page. */
-.btn-action {
-  @apply transition w-full rounded-2xl px-4 py-4 text-2xl font-black shadow-lg active:scale-95;
-  min-height: 3.75rem;
+/* ------------------------------------------------------------------ *
+ * Panels — one shape everywhere, raised by shadow not border
+ * ------------------------------------------------------------------ */
+.card {
+  @apply rounded-3xl bg-white;
+  box-shadow: var(--sw-shadow);
+}
+.card-lg {
+  @apply rounded-3xl bg-white;
+  box-shadow: var(--sw-shadow-lg);
+}
+.card-quiet {
+  @apply rounded-3xl bg-white;
+  box-shadow: var(--sw-shadow-sm);
 }
 
-/* Secondary: supporting actions, half the visual weight. */
+/* ------------------------------------------------------------------ *
+ * Typography — big, heavy, tight
+ * ------------------------------------------------------------------ */
+.title {
+  @apply text-center text-2xl font-black tracking-tight text-[#2b2d2e];
+}
+.subtitle {
+  @apply mt-1 text-center text-[#5b6069];
+}
+
+/* ------------------------------------------------------------------ *
+ * Actions — one loud accent for the single primary per screen
+ * ------------------------------------------------------------------ */
+.btn-action {
+  @apply transition w-full rounded-2xl px-4 py-4 text-2xl font-black active:scale-[0.98];
+  min-height: 3.75rem;
+  background: var(--sw-accent);
+  color: #fff;
+  box-shadow: var(--sw-shadow-lg);
+}
+.btn-action:hover {
+  background: var(--sw-accent-hover);
+}
+
 .btn-action-md {
-  @apply transition rounded-2xl px-4 py-3 text-lg font-black shadow-lg active:scale-95;
+  @apply transition rounded-2xl px-4 py-3 text-lg font-black active:scale-[0.98];
   min-height: 3.5rem;
 }
 
-/* Helper: low-emphasis controls in dense areas (play screen). */
 .btn-action-sm {
-  @apply transition rounded-2xl px-3 py-2 text-base font-bold active:scale-95;
+  @apply transition rounded-2xl px-3 py-2 text-base font-bold active:scale-[0.98];
   min-height: 3rem;
 }
 
 /* Back: always just-fit and always last. */
 .btn-back {
-  @apply transition w-fit rounded-2xl border-4 border-slate-300 bg-white px-4 py-3 text-lg font-black text-slate-500 active:scale-95 hover:bg-slate-50;
+  @apply transition w-fit rounded-2xl border-2 bg-white px-4 py-3 text-lg font-black active:scale-[0.98];
   min-height: 3.5rem;
+  border-color: #cdd3da;
+  color: var(--sw-ink-soft);
+  box-shadow: var(--sw-shadow-sm);
+}
+.btn-back:hover {
+  background: #f6f8f9;
 }
 
-/* Playful motion for a kid-friendly feel */
+/* Neutral outlined button */
+.btn-plain {
+  @apply transition rounded-2xl border-2 bg-white px-4 py-3 text-lg font-black text-[#2b2d2e] active:scale-[0.98];
+  border-color: #cdd3da;
+  box-shadow: var(--sw-shadow-sm);
+}
+.btn-plain:hover {
+  background: #f6f8f9;
+}
+
+/* Tertiary: small inline text actions. These stay quiet so the one real
+   button on the screen stays obvious. */
+.btn-quiet {
+  @apply transition inline-flex items-center gap-1 rounded-xl px-2 py-1 text-sm font-bold text-[#007d8c] active:scale-95;
+}
+.btn-quiet:hover {
+  background: var(--sw-info-soft);
+}
+.btn-quiet:disabled {
+  @apply cursor-not-allowed opacity-35;
+}
+.btn-quiet:disabled:hover {
+  background: transparent;
+}
+
+/* Slim row: an accordion header or inline stat strip. Reads as a panel row,
+   never as a button, so it never competes with the primary action. */
+.row-panel {
+  @apply flex w-full items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 text-left font-black;
+  box-shadow: var(--sw-shadow-sm);
+}
+.row-panel:hover {
+  background: #f6f8f9;
+}
+
+/* ------------------------------------------------------------------ *
+ * Selection — Switch always makes the current choice obvious
+ * ------------------------------------------------------------------ */
+.choice {
+  @apply transition relative rounded-2xl border-2 bg-white active:scale-[0.98];
+  border-color: #dfe4ea;
+  box-shadow: var(--sw-shadow-sm);
+}
+.choice:hover {
+  border-color: #b9c2cb;
+}
+.choice-on {
+  @apply rounded-2xl border-2 bg-white;
+  border-color: var(--sw-accent);
+  box-shadow: var(--sw-shadow);
+  background: var(--sw-accent-soft);
+}
+
+/* ------------------------------------------------------------------ *
+ * Focus — visible, high contrast, keyboard friendly
+ * ------------------------------------------------------------------ */
+:where(a, button, input, textarea, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--sw-ring);
+  border-radius: 1rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * Playful motion
+ * ------------------------------------------------------------------ */
 @keyframes wiggle {
   0%, 100% { transform: rotate(0deg); }
   25% { transform: rotate(-6deg); }
@@ -64,6 +197,15 @@ body {
 .animate-wiggle { animation: wiggle 1.6s ease-in-out infinite; }
 .animate-float { animation: float 2.4s ease-in-out infinite; }
 .animate-pop { animation: pop 0.35s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 .confetti {
   position: fixed;
   inset: 0;

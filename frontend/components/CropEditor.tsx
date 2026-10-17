@@ -70,25 +70,25 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
   const boxes = [...regions, ...(draft ? [normalizeRegion(draft)] : [])];
 
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">{t("crop.title")}</h2>
-      <p className="mt-1 text-center text-slate-500">
+    <section className="card p-6">
+      <h2 className="title">{t("crop.title")}</h2>
+      <p className="subtitle">
         {regions.length === 0 ? t("crop.helpFirst") : t("crop.helpMore")}
       </p>
 
-      <div className="mt-3 flex rounded-2xl bg-slate-100 p-1 text-base font-black">
+      <div className="mt-3 flex gap-1 rounded-2xl bg-[#e3e7eb] p-1 text-base font-black">
         <button
           onClick={() => setMode("lines")}
-          className={`flex-1 rounded-xl px-3 py-3 ${
-            mode === "lines" ? "bg-white shadow" : "text-slate-500"
+          className={`flex-1 rounded-xl px-3 py-3 transition ${
+            mode === "lines" ? "bg-white text-[#2b2d2e] shadow-sm" : "text-[#5b6069]"
           }`}
         >
           {t("crop.modeLines")}
         </button>
         <button
           onClick={() => setMode("words")}
-          className={`flex-1 rounded-xl px-3 py-3 ${
-            mode === "words" ? "bg-white shadow" : "text-slate-500"
+          className={`flex-1 rounded-xl px-3 py-3 transition ${
+            mode === "words" ? "bg-white text-[#2b2d2e] shadow-sm" : "text-[#5b6069]"
           }`}
         >
           {t("crop.modeWords")}
@@ -161,7 +161,7 @@ export default function CropEditor({ imageUrl, onConfirm, scanning }: Props) {
         <button
           onClick={() => onConfirm(orderRegions(regions), mode)}
           disabled={regions.length === 0 || scanning}
-          className="btn-action bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
+          className="btn-action disabled:opacity-40"
         >
           {regions.length === 0
             ? t("crop.readDrawing")

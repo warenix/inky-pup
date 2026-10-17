@@ -89,20 +89,20 @@ export default function SharePanel({ items, settings }: Props) {
   };
 
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">{t("share.title")}</h2>
-      <p className="mt-1 text-center text-slate-500">{t("share.subtitle")}</p>
+    <section className="card p-6">
+      <h2 className="title">{t("share.title")}</h2>
+      <p className="subtitle">{t("share.subtitle")}</p>
       <div className="mt-3 flex flex-col gap-2">
         <div className="flex gap-2">
           <button
             onClick={copyLink}
-            className="btn-action-md flex-1 bg-purple-500 text-white hover:bg-purple-600"
+            className="btn-action-md flex-1 bg-[#5b5bd6] text-white hover:bg-[#4a4ac4]"
           >
             {copied ? t("share.copied") : t("share.copyLink")}
           </button>
           <button
             onClick={() => setShowQR((v) => !v)}
-            className="btn-action-md flex-1 bg-amber-400 text-amber-900 hover:bg-amber-500"
+            className="btn-action-md flex-1 bg-[#f5a623] text-[#5a3a00] hover:bg-[#e0941c]"
           >
             {showQR ? t("share.hideQR") : t("share.showQR")}
           </button>
@@ -110,14 +110,14 @@ export default function SharePanel({ items, settings }: Props) {
         {typeof navigator !== "undefined" && "share" in navigator && (
           <button
             onClick={() => void shareNative()}
-            className="btn-action-md w-full border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+            className="btn-action-md w-full btn-plain"
           >
             {t("share.sendChat")}
           </button>
         )}
         <button
           onClick={downloadJson}
-          className="btn-action-md w-full border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+          className="btn-action-md w-full btn-plain"
         >
           {t("share.download")}
         </button>

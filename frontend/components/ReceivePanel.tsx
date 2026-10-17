@@ -54,9 +54,9 @@ export default function ReceivePanel({ onImport }: Props) {
   };
 
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">{t("receive.title")}</h2>
-      <p className="mt-1 text-center text-slate-500">{t("receive.subtitle")}</p>
+    <section className="card p-6">
+      <h2 className="title">{t("receive.title")}</h2>
+      <p className="subtitle">{t("receive.subtitle")}</p>
       <div className="mt-3 flex gap-2">
         <input
           value={text}
@@ -67,14 +67,14 @@ export default function ReceivePanel({ onImport }: Props) {
         <button
           onClick={() => text.trim() && importCode(text)}
           disabled={!text.trim()}
-          className="btn-action-md shrink-0 bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
+          className="btn-action-md shrink-0 bg-[#007d8c] text-white hover:bg-[#00656f] disabled:opacity-40"
         >
           {t("receive.open")}
         </button>
       </div>
       <button
         onClick={() => fileRef.current?.click()}
-        className="btn-action-md mt-2 w-full border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+        className="btn-action-md mt-2 w-full btn-plain"
       >
         {t("receive.loadFile")}
       </button>

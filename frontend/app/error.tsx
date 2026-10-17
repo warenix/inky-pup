@@ -24,7 +24,7 @@ export default function ErrorBoundary({
       <p className="text-lg text-slate-500">{t("errorPage.body")}</p>
       <button
         onClick={() => reset()}
-        className="btn-action bg-green-500 text-white hover:bg-green-600"
+        className="btn-action"
       >
         {t("errorPage.retry")}
       </button>

@@ -37,28 +37,28 @@ export default function AddWords({ count, onManual, onPhotoFile }: Props) {
   };
 
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">{t("add.title")}</h2>
-      <p className="mt-1 text-center text-slate-500">
+    <section className="card p-6">
+      <h2 className="title">{t("add.title")}</h2>
+      <p className="subtitle">
         {count === 0 ? t("add.subtitleEmpty") : t("add.subtitleMore")}
       </p>
       <div className="mt-4 flex flex-col gap-3">
         <button
           onClick={onManual}
-          className="btn-action bg-purple-500 text-white hover:bg-purple-600"
+          className="btn-action"
         >
           {t("add.manual")}
         </button>
         <div className="flex gap-2">
           <button
             onClick={takePhoto}
-            className="btn-action-md flex-1 bg-blue-500 text-white hover:bg-blue-600"
+            className="btn-action-md flex-1 bg-[#007d8c] text-white hover:bg-[#00656f]"
           >
             {t("add.photo")}
           </button>
           <button
             onClick={() => fileRef.current?.click()}
-            className="btn-action-md flex-1 border-4 border-blue-400 bg-white text-blue-500 hover:bg-blue-50"
+            className="btn-action-md flex-1 btn-plain"
           >
             {t("add.upload")}
           </button>

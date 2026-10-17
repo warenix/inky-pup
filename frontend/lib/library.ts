@@ -13,6 +13,8 @@ export interface DictationEntry {
   updatedAt: number;
   items: DictationItem[];
   settings: TeacherSettings;
+  /** Which teacher profile was assigned to this dictation, if any. */
+  teacherId: string | null;
 }
 
 const DB_NAME = "smart-dictation-db";
@@ -72,7 +74,8 @@ export async function listEntries(): Promise<DictationEntry[]> {
 export async function saveEntry(
   name: string,
   items: DictationItem[],
-  settings: TeacherSettings
+  settings: TeacherSettings,
+  teacherId: string | null = null
 ): Promise<DictationEntry> {
   const now = Date.now();
   const entry: DictationEntry = {
@@ -82,6 +85,7 @@ export async function saveEntry(
     updatedAt: now,
     items: items.map((it, i) => ({ id: i + 1, text: it.text })),
     settings: { ...settings },
+    teacherId,
   };
   await run("readwrite", (s) => s.add(entry));
   return entry;
@@ -91,7 +95,8 @@ export async function saveEntry(
 export async function updateEntry(
   id: string,
   items: DictationItem[],
-  settings: TeacherSettings
+  settings: TeacherSettings,
+  teacherId: string | null = null
 ): Promise<DictationEntry> {
   const existing = (await run("readonly", (s) =>
     s.get(id)
@@ -101,6 +106,7 @@ export async function updateEntry(
     ...existing,
     items: items.map((it, i) => ({ id: i + 1, text: it.text })),
     settings: { ...settings },
+    teacherId,
     updatedAt: Date.now(),
   };
   await run("readwrite", (s) => s.put(updated));

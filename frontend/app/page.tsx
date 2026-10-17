@@ -4,6 +4,7 @@ import AddWords from "../components/AddWords";
 import CaptureStep from "../components/CaptureStep";
 import CropEditor from "../components/CropEditor";
 import KidSettings from "../components/KidSettings";
+import TeacherProfiles from "../components/TeacherProfiles";
 import LibraryPanel from "../components/LibraryPanel";
 import PlayerEngine from "../components/PlayerEngine";
 import ReceivePanel from "../components/ReceivePanel";
@@ -20,6 +21,7 @@ import {
 import { deleteEntry, listEntries, renameEntry, saveEntry, updateEntry, type DictationEntry } from "../lib/library";
 import { clearShareFromLocation, parseShareFromLocation } from "../lib/share";
 import { estimateSeconds, formatEstimate } from "../lib/estimate";
+import { applyProfile, getProfile } from "../lib/profiles";
 import { DEFAULT_SETTINGS, type DictationItem, type TeacherSettings } from "../lib/types";
 import { speechSupported } from "../lib/speech";
 import type { TKey, Vars } from "../lib/i18n";
@@ -70,12 +72,12 @@ function AnswerCheck({
     onWrongChange?.(items.filter((it) => next[it.id] === false));
   };
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">
+    <section className="card p-6">
+      <h2 className="title">
         {t(hidden ? "answer.titleHidden" : "answer.titleShown")}
       </h2>
       {hidden && (
-        <p className="mt-1 text-center text-slate-500">{t("answer.hint")}</p>
+        <p className="subtitle">{t("answer.hint")}</p>
       )}
       {marked > 0 && (
         <p className="mt-2 text-center text-xl font-black text-amber-600">
@@ -155,13 +157,12 @@ function EstimateCard({
   if (items.length === 0) return null;
   const { big, small } = formatEstimate(estimateSeconds(items, settings), t);
   return (
-    <section className="rounded-3xl border-4 border-amber-300 bg-amber-100 p-6 text-center shadow-sm">
-      <p className="text-5xl">⏱️</p>
-      <p className="mt-1 text-2xl font-black text-amber-800">{big}</p>
-      <p className="text-sm text-amber-700">
+    <p className="row-panel text-base text-[#5b6069]">
+      <span>{big}</span>
+      <span className="text-sm font-bold">
         {small} · {t("estimate.words", { n: items.length })}
-      </p>
-    </section>
+      </span>
+    </p>
   );
 }
 
@@ -182,6 +183,8 @@ export default function Home() {
   const [playKey, setPlayKey] = useState(0);
   const [savedFlash, setSavedFlash] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     listEntries().then(setEntries).catch(() => {});
@@ -357,7 +360,7 @@ export default function Home() {
   const persistVoice = async () => {
     if (!loadedId) return;
     try {
-      await updateEntry(loadedId, items, settings);
+      await updateEntry(loadedId, items, settings, profileId);
       await refreshEntries();
     } catch {
       /* entry gone or storage blocked — stays in memory for this session */
@@ -372,13 +375,13 @@ export default function Home() {
         // Already saved — update it instead of making a copy.
         // Falls back to a fresh save if the entry somehow went missing.
         try {
-          await updateEntry(loadedId, items, settings);
+          await updateEntry(loadedId, items, settings, profileId);
         } catch {
-          const entry = await saveEntry(autoName(), items, settings);
+          const entry = await saveEntry(autoName(), items, settings, profileId);
           setLoadedId(entry.id);
         }
       } else {
-        const entry = await saveEntry(autoName(), items, settings);
+        const entry = await saveEntry(autoName(), items, settings, profileId);
         setLoadedId(entry.id);
       }
       await refreshEntries();
@@ -396,6 +399,12 @@ export default function Home() {
     // Fill defaults for entries saved before newer settings existed.
     setSettings({ ...DEFAULT_SETTINGS, ...entry.settings });
     setLoadedId(entry.id);
+    // Remember which teacher was assigned to this dictation.
+    setProfileId(entry.teacherId ?? null);
+    const profile = entry.teacherId ? getProfile(entry.teacherId) : null;
+    if (profile) {
+      setSettings(applyProfile({ ...DEFAULT_SETTINGS, ...entry.settings }, profile));
+    }
     setError(null);
     setFlow("library");
     setScreen("review");
@@ -460,7 +469,7 @@ export default function Home() {
       {showStepper && <Stepper steps={steps} current={stepIndex[screen] ?? 0} />}
 
       {screen === "home" && (
-        <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
+        <section className="card-lg p-8 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/mascot.svg" alt={t("common.mascotAlt")} className="mx-auto h-28 w-28 transition hover:scale-110" />
           <h1 className="mt-2 text-3xl font-black">{t("home.title")}</h1>
@@ -468,13 +477,13 @@ export default function Home() {
           <div className="mt-6 flex flex-col gap-3">
             <button
               onClick={startFresh}
-              className="btn-action bg-green-500 text-white hover:bg-green-600"
+              className="btn-action"
             >
               {t("home.new")}
             </button>
             <button
               onClick={goLibrary}
-              className="btn-action bg-purple-500 text-white hover:bg-purple-600"
+              className="btn-action"
             >
               {t("home.myDictations")}
               {entries.length > 0 ? ` (${entries.length})` : ""}
@@ -518,10 +527,10 @@ export default function Home() {
       {screen === "areas" && staged && (
         <>
           {loading ? (
-            <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
+            <section className="card-lg p-8 text-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/mascot.svg" alt={t("common.mascotAlt")} className="mx-auto h-24 w-24 animate-bounce" />
-              <h2 className="mt-2 text-2xl font-black">{t("scan.reading")}</h2>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">{t("scan.reading")}</h2>
               <p className="mt-2 text-4xl font-black text-amber-500">
                 {progress ? `${Math.round(progress.progress * 100)}%` : "…"}
               </p>
@@ -542,11 +551,11 @@ export default function Home() {
             />
           )}
           {error && !loading && (
-            <div className="rounded-3xl bg-red-50 p-6 text-center shadow-sm">
+            <div className="card border-4 border-[#e60012]/20 bg-[#fff5f5] p-6 text-center">
               <p className="mt-2 text-xl font-black text-red-600">{t("scan.oops", { message: error })}</p>
               <button
                 onClick={loadDemo}
-                className="btn-action-md mt-3 bg-white text-slate-600 hover:bg-slate-50"
+                className="btn-action-md mt-3"
               >
                 {t("scan.demo")}
               </button>
@@ -593,14 +602,14 @@ export default function Home() {
             <button
               onClick={goReady}
               disabled={!hasList}
-              className="btn-action bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
+              className="btn-action disabled:opacity-40"
             >
               {t("common.next")}
             </button>
             <button
               onClick={handleSaveEntry}
               disabled={items.length === 0 || saving}
-              className="btn-action-md bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40"
+              className="btn-action-md bg-[#007d8c] text-white hover:bg-[#00656f] disabled:opacity-40"
             >
               {saving ? t("common.saving") : t("common.save")}
             </button>
@@ -622,7 +631,28 @@ export default function Home() {
               {t("ready.voiceRemembered", { name: loadedEntry.name })}
             </p>
           )}
-          <KidSettings settings={settings} setSettings={setSettings} />
+          <TeacherProfiles
+            settings={settings}
+            setSettings={setSettings}
+            activeId={profileId}
+            onActiveChange={setProfileId}
+          />
+          {/* The teacher voice is the main control; the full settings stay
+              hidden until someone wants to edit the teacher by hand. */}
+          <button
+            onClick={() => setShowSettings((v) => !v)}
+            aria-expanded={showSettings}
+            className="row-panel"
+          >
+            <span>{t("ready.adjustAll")}</span>
+            <span aria-hidden="true" className="text-sm text-[#5b6069]">
+              {showSettings ? "▴" : "▾"}
+            </span>
+          </button>
+
+          {showSettings && (
+            <KidSettings settings={settings} setSettings={setSettings} />
+          )}
           <EstimateCard items={items} settings={settings} t={t} />
           <div className="flex flex-col gap-3">
             <button
@@ -637,7 +667,7 @@ export default function Home() {
                 setPlayKey((k) => k + 1);
                 setScreen("play");
               }}
-              className="btn-action bg-green-500 text-white hover:bg-green-600"
+              className="btn-action"
               disabled={!speechSupported()}
             >
               {t("ready.start")}
@@ -678,7 +708,7 @@ export default function Home() {
             <span style={{ left: "72%", animationDelay: "0.45s" }}>⭐</span>
             <span style={{ left: "88%", animationDelay: "0.6s" }}>🎉</span>
           </div>
-          <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
+          <section className="card-lg p-8 text-center">
             <h1 className="mt-2 text-3xl font-black">{t("done.title")}</h1>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/mascot.svg" alt={t("common.mascotAlt")} className="mx-auto mt-3 h-24 w-24 animate-bounce" />
@@ -693,12 +723,12 @@ export default function Home() {
             onWrongChange={setWrongItems}
             t={t}
           />
-          <section className="rounded-3xl bg-white p-6 shadow-sm">
+          <section className="card p-6">
             <div className="flex flex-col gap-3">
               {wrongItems.length > 0 && (
                 <button
                   onClick={handleRetryWrong}
-                  className="btn-action bg-amber-500 text-white hover:bg-amber-600"
+                  className="btn-action"
                 >
                   {t("done.practiseMissed", { n: wrongItems.length })}
                 </button>
@@ -708,7 +738,7 @@ export default function Home() {
                   setPlayKey((k) => k + 1);
                   setScreen("play");
                 }}
-                className="btn-action bg-green-500 text-white hover:bg-green-600"
+                className="btn-action"
               >
                 {t("done.practiseAgain")}
               </button>

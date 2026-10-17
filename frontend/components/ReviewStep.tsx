@@ -68,9 +68,9 @@ export default function ReviewStep({ items, setItems }: Props) {
   };
 
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">{t("review.title")}</h2>
-      <p className="mt-1 text-center text-slate-500">{t("review.subtitle")}</p>
+    <section className="card p-6">
+      <h2 className="title">{t("review.title")}</h2>
+      <p className="subtitle">{t("review.subtitle")}</p>
       <ul className="mt-4 space-y-1">
         {items.map((it, i) => (
           <li key={it.id}>
@@ -149,7 +149,7 @@ export default function ReviewStep({ items, setItems }: Props) {
             className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-center text-2xl font-black">
+            <h3 className="title">
               {t("review.modalTitle", { n: editingId })}
             </h3>
             <textarea
@@ -172,7 +172,7 @@ export default function ReviewStep({ items, setItems }: Props) {
               </button>
               <button
                 onClick={saveEditor}
-                className="btn-action-md flex-1 bg-green-500 text-white hover:bg-green-600"
+                className="btn-action-md flex-1 bg-[#007d8c] text-white hover:bg-[#00656f]"
               >
                 ✓ {t("common.done")}
               </button>

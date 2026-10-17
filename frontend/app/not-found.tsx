@@ -13,7 +13,7 @@ export default function NotFound() {
       <p className="text-lg text-slate-500">{t("notFound.body")}</p>
       <Link
         href="/"
-        className="btn-action inline-block bg-green-500 text-white hover:bg-green-600"
+        className="btn-action inline-block"
       >
         {t("notFound.home")}
       </Link>

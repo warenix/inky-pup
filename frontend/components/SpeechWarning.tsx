@@ -23,7 +23,7 @@ export default function SpeechWarning({ onDismiss }: Props) {
   if (!warned) return null;
 
   return (
-    <section className="rounded-3xl border-4 border-yellow-200 bg-yellow-50 p-6 shadow-sm">
+    <section className="card border-4 border-[#007d8c]/30 bg-[#e2f4f6] p-6">
       <div className="flex items-start gap-3">
         <div>
           <h3 className="mb-1 font-black text-amber-800">{t("speechWarn.title")}</h3>

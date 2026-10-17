@@ -30,10 +30,8 @@ function Choice({
   return (
     <button
       onClick={onClick}
-      className={`btn-action-sm flex flex-col items-center justify-center border-4 px-2 py-3 text-lg font-bold ${
-        active
-          ? "border-amber-400 bg-amber-100 text-amber-800"
-          : "border-slate-200 bg-white text-slate-600"
+      className={`flex flex-col items-center justify-center px-2 py-3 text-lg font-bold ${
+        active ? "choice-on text-[#2b2d2e]" : "choice text-[#5b6069]"
       }`}
     >
       {children}
@@ -48,9 +46,9 @@ export default function KidSettings({ settings, setSettings }: Props) {
     setSettings({ ...settings, [k]: v });
 
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">{t("settings.title")}</h2>
-      <p className="mt-1 text-center text-slate-500">{t("settings.subtitle")}</p>
+    <section className="card p-6">
+      <h2 className="title">{t("settings.title")}</h2>
+      <p className="subtitle">{t("settings.subtitle")}</p>
 
       <h3 className="mt-5 text-lg font-black">{t("settings.voice")}</h3>
       <div className="mt-2 grid grid-cols-2 gap-2">
@@ -62,10 +60,8 @@ export default function KidSettings({ settings, setSettings }: Props) {
             <button
               key={l.value}
               onClick={() => set("lang", l.value)}
-              className={`btn-action-sm w-full border-4 px-2 py-3 text-base font-bold ${
-                active
-                  ? "border-amber-400 bg-amber-100 text-amber-800"
-                  : "border-slate-200 bg-white text-slate-600"
+              className={`w-full px-2 py-3 text-base font-bold ${
+                active ? "choice-on text-[#2b2d2e]" : "choice text-[#5b6069]"
               }`}
             >
               {t(`settings.lang.${l.value}` as TKey)}

@@ -219,9 +219,9 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
 
   if (items.length === 0) {
     return (
-      <section className="rounded-3xl bg-white p-6 text-center shadow-sm">
-        <h2 className="mt-2 text-2xl font-black">{t("play.noWordsTitle")}</h2>
-        <p className="mt-1 text-slate-500">{t("play.noWordsBody")}</p>
+      <section className="card p-6 text-center">
+        <h2 className="mt-2 text-2xl font-black tracking-tight">{t("play.noWordsTitle")}</h2>
+        <p className="mt-1 text-[#5b6069]">{t("play.noWordsBody")}</p>
       </section>
     );
   }
@@ -236,8 +236,8 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
   const canPeek = settings.hideWords !== false && phase !== "counting" && phase !== "done";
 
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">{t("play.title")}</h2>
+    <section className="card p-6">
+      <h2 className="title">{t("play.title")}</h2>
 
       <div className="mt-3 h-4 overflow-hidden rounded-full bg-slate-100">
         <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-green-400 transition-all" style={{ width: `${progress}%` }} />
@@ -320,14 +320,14 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
       {/* Controls: one primary action, a compact helper row, then back last. */}
       <div className="mt-4 flex flex-col gap-3">
         {phase === "counting" && (
-          <button onClick={start} className="btn-action bg-green-500 text-white hover:bg-green-600">
+          <button onClick={start} className="btn-action">
             {t("play.startNow")}
           </button>
         )}
         {phase !== "counting" && phase !== "idle" && phase !== "done" && (
           <button
             onClick={togglePause}
-            className="btn-action bg-amber-400 text-amber-950 hover:bg-amber-500"
+            className="btn-action bg-[#007d8c] text-white hover:bg-[#00656f]"
           >
             {phase === "paused" ? t("play.keepGoing") : t("play.pause")}
           </button>
@@ -338,19 +338,19 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
           <>
             {phase !== "idle" && phase !== "done" && (
               <div className="flex gap-2">
-                <button onClick={repeatCurrent} className="btn-action-sm flex-1 bg-purple-500 text-white hover:bg-purple-600">
+                <button onClick={repeatCurrent} className="btn-action-sm flex-1 bg-[#5b5bd6] text-white hover:bg-[#4a4ac4]">
                   {t("play.again")}
                 </button>
-                <button onClick={skipNext} className="btn-action-sm flex-1 bg-teal-500 text-white hover:bg-teal-600">
+                <button onClick={skipNext} className="btn-action-sm flex-1 bg-[#00a2a8] text-white hover:bg-[#008b90]">
                   {t("play.next")}
                 </button>
               </div>
             )}
             <div className="flex gap-2">
-              <button onClick={restart} className="btn-action-sm flex-1 border-4 border-slate-200 bg-white text-slate-600 hover:bg-slate-50">
+              <button onClick={restart} className="btn-action-sm flex-1 btn-plain !py-2 !text-base">
                 {t("play.startOver")}
               </button>
-              <button onClick={finish} className="btn-action-sm flex-1 bg-blue-500 text-white hover:bg-blue-600">
+              <button onClick={finish} className="btn-action-sm flex-1 bg-[#e60012] text-white hover:bg-[#c80010]">
                 {t("common.done")}
               </button>
             </div>

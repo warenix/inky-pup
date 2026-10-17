@@ -55,9 +55,9 @@ export default function CaptureStep({
   };
 
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm">
-      <h2 className="text-center text-2xl font-black">{t("capture.title")}</h2>
-      <p className="mt-1 text-center text-slate-500">{t("capture.subtitle")}</p>
+    <section className="card p-6">
+      <h2 className="title">{t("capture.title")}</h2>
+      <p className="subtitle">{t("capture.subtitle")}</p>
       {appendCount > 0 && (
         <p className="mx-auto mt-2 w-fit rounded-full bg-green-100 px-4 py-1 text-center font-black text-green-700">
           {t("capture.appendBadge", { n: appendCount })}
@@ -90,13 +90,13 @@ export default function CaptureStep({
         <div className="mt-4 flex w-full flex-col gap-3">
           <button
             onClick={takePhoto}
-            className="btn-action bg-blue-500 text-white hover:bg-blue-600"
+            className="btn-action"
           >
             {t("capture.takePhoto")}
           </button>
           <button
             onClick={() => fileRef.current?.click()}
-            className="btn-action-md border-4 border-blue-400 bg-white text-blue-500 hover:bg-blue-50"
+            className="btn-action-md btn-plain"
           >
             {t("capture.choosePicture")}
           </button>

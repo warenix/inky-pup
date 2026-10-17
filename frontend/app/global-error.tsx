@@ -19,7 +19,7 @@ export default function GlobalError({
           <p className="text-lg text-slate-500">{error.message}</p>
           <button
             onClick={() => reset()}
-            className="btn-action bg-green-500 text-white hover:bg-green-600"
+            className="btn-action"
           >
             {t("errorPage.reload")}
           </button>

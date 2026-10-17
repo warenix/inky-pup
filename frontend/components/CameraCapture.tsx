@@ -159,9 +159,9 @@ export default function CameraCapture({ onCapture, onCancel, onUnavailable }: Pr
             onClick={snap}
             disabled={status !== "live"}
             aria-label={t("camera.shutter")}
-            className="btn-action h-16 w-16 rounded-full bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
+            className="btn-action h-16 w-16 rounded-full disabled:opacity-40"
           >
-            <span className="block h-11 w-11 rounded-full border-4 border-white bg-green-600" />
+            <span className="block h-11 w-11 rounded-full border-4 border-white bg-black/15" />
           </button>
 
           {hasFront && (
