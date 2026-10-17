@@ -16,6 +16,31 @@ export function pickVoice(lang: string): SpeechSynthesisVoice | null {
   );
 }
 
+/** Voices need a moment to load on some browsers (Linux Brave especially). */
+export function loadVoices(): Promise<SpeechSynthesisVoice[]> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      resolve([]);
+      return;
+    }
+    const existing = window.speechSynthesis.getVoices();
+    if (existing.length > 0) {
+      resolve(existing);
+      return;
+    }
+    const handler = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        window.speechSynthesis.onvoiceschanged = null;
+        resolve(voices);
+      }
+    };
+    window.speechSynthesis.onvoiceschanged = handler;
+    // Safari sometimes never fires the event.
+    setTimeout(() => handler(), 1500);
+  });
+}
+
 export function speak(
   text: string,
   opts: {

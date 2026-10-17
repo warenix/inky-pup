@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DictationItem, TeacherSettings } from "../lib/types";
 import { chunkSentence, repeatPauseSeconds, singleChunk } from "../lib/chunks";
-import { sleep, speak, stopSpeech } from "../lib/speech";
+import { loadVoices, sleep, speak, stopSpeech } from "../lib/speech";
 import { useT } from "./LocaleProvider";
 
 interface Props {
@@ -25,6 +25,7 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
   const [peek, setPeek] = useState(false);
   const [countdown, setCountdown] = useState(settings.writingTime);
   const [ready, setReady] = useState(READY_SECONDS);
+  const [voicesReady, setVoicesReady] = useState(false);
   const runId = useRef(0);
   const pausedRef = useRef(false);
   const t = useT();
@@ -73,6 +74,7 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
   // word. "Start!" is no longer needed to begin a session.
   useEffect(() => {
     if (phase !== "counting") return;
+    if (!voicesReady) return; // wait for voices to load (Linux Brave)
     if (ready <= 0) {
       start();
       return;
@@ -80,7 +82,7 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
     const t = setTimeout(() => setReady((r) => r - 1), 1000);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, ready]);
+  }, [phase, ready, voicesReady]);
 
   function advance(id: number) {
     // Called when countdown hits 0 early via effect — jump handled by sleep anyway.
@@ -216,6 +218,18 @@ export default function PlayerEngine({ items, settings, onFinish, onQuit }: Prop
     },
     []
   );
+
+  // Load voices as soon as the player mounts so the manual "Start!" button
+  // works immediately (Linux Brave loads voices asynchronously).
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    loadVoices().then(() => {
+      setVoicesReady(true);
+      clearTimeout(timer);
+    });
+    timer = setTimeout(() => setVoicesReady(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (items.length === 0) {
     return (
